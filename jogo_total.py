@@ -12,7 +12,7 @@ pygame.display.set_caption('Navy Assault') #Coloca o título da janela
 #----Inicializa estrutura de dados 
 game = True
 # ---- Inicia assets (Imagem) 
-imagem_fundo = pygame.image.load('Imagens/tile_0084_water11.png').convert() #Inicializa a imagem no pygame 
+imagem_fundo = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
 imagem_fundo = pygame.transform.scale(imagem_fundo , (650,800)).convert() #Converte a imagem para a escala 
 
 
