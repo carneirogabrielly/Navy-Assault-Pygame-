@@ -26,15 +26,15 @@ game = True
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , imagem_oponente): #Essa classe baseia-se na entrada de uma imagem 
-        pygame.sprite.Sprite.__init__(self) 
-        self.image = imagem_oponente
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randint(1 , 650)
-        self.rect.y = 1
-        self.vx_oponente = 1.5
-        self.vy_oponente = 6
+        pygame.sprite.Sprite.__init__(self) #Classe base simples para objetos de jogos visíveis
+        self.image = imagem_oponente #definindo a imagem como a imagem dada na função
+        self.rect = self.image.get_rect() #convertendo a imagem em um retangulo para conseguir utilizar os comandos rect
+        self.rect.x = random.randint(1 , 650) #posição no eixo x do retângulo
+        self.rect.y = random.randint(-1,1) #posição no eixo y do retângulo
+        self.vx_oponente = 1.5 #velocidade do navio em x 
+        self.vy_oponente = 6 #velocidade do navio em y 
     
-    def update(self):
+    def update(self): #Função para, quando for acionada dentro da classe, atualizar a posição do jogador
         #Atualizando a posição do navio 
         self.rect.x += self.vx_oponente 
         self.rect.y += self.vy_oponente
@@ -70,7 +70,7 @@ while game:
         # ----- Verifica consequências
         if event.type == pygame.QUIT: #Se o comando do evento for igual a pygame.quit, o loop acaba 
             game = False
-    navios_inimigo.update()
+    navios_inimigo.update() #Atualizando a posição do inimigo 
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
     window.blit(imagem_fundo , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
