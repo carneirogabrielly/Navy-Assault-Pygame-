@@ -113,13 +113,12 @@ class Tiro(pygame.sprite.Sprite):
 #criando navios: 
 all_sprites = pygame.sprite.Group() #É uma lista com mais funcionalidades
 todos_tiros = pygame.sprite.Group()
-
-n_inimigos = 4
 todos_inimigos = pygame.sprite.Group()
-for i in range(n_inimigos):
-    navio = Inimigo(imagem_oponente)
-    all_sprites.add(navio)
-    todos_inimigos.add(navio)
+
+for i in range(4):
+    navio_inimigo = Inimigo(imagem_oponente)
+    all_sprites.add(navio_inimigo)
+    todos_inimigos.add(navio_inimigo)
 
 navio_amigo = jogador(imagem_jogador, all_sprites, todos_tiros, imagem_tiro)
 all_sprites.add(navio_amigo)
@@ -161,7 +160,11 @@ while game:
     
     for tirinho in todos_tiros:
         if pygame.sprite.spritecollide(tirinho, todos_inimigos, True):
+            novo_inimigo = Inimigo(imagem_oponente)
+            all_sprites.add(novo_inimigo)
+            todos_inimigos.add(novo_inimigo)
             tirinho.kill()
+            
 
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
