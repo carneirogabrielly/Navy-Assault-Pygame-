@@ -172,4 +172,4 @@ while game:
     #Autaliza estado do jogo 
     pygame.display.update() #Atualiza o estado do jogo observado a cada loop
 #--- Finalização 
-pygame.quit() #Finaliza o game 
+pygame.quit() #Finaliza o game   
