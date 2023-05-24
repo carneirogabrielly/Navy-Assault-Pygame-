@@ -1,6 +1,6 @@
 import pygame 
 import math 
-import random 
+import random
 pygame.init() #Inicializa o framework do pygame 
 
 #---Gera tela principal 
@@ -12,20 +12,48 @@ pygame.display.set_caption('Navy Assault') #Coloca o título da janela
 
 
 # ---- Inicia assets (Imagem) 
+#Dimensões oponentes
 largura_oponente = 130  
 comprimento_oponente = 160
+#Dimensões jogador
 largura_jogador = 130  
 comprimento_jogador = 160
+#Dimensões bala 
+largura_bala = 30 
+comprimento_bala = 60
+
 imagem_fundo = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
 imagem_fundo = pygame.transform.scale(imagem_fundo , (650,800)) #Converte a imagem para a escala 
+
 imagem_oponente = pygame.image.load('Imagens/Barco_inimigo/Barco_inimigo.png').convert_alpha()
 imagem_oponente = pygame.transform.scale(imagem_oponente , (largura_oponente,comprimento_oponente))
+
 imagem_jogador = pygame.image.load('Imagens/Barco_jogador/Barco/Barco_amigo.png').convert_alpha()
 imagem_jogador = pygame.transform.scale(imagem_jogador , (largura_jogador,comprimento_jogador))
 
-
+imagem_bala = pygame.image.load('Imagens/Barco_jogador/Canhões\Canhões_jogador/Primeiro_canhão_jogador/Tiro_canhão1.png').convert_alpha()
+imagem_bala = pygame.transform.scale(imagem_bala , (largura_bala , comprimento_bala))
 #----Inicializa estrutura de dados 
 game = True
+
+
+#Classe para o tiro 
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self , imagem_bala , px_jogador , py_jogador):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = imagem_bala
+        self.rect = imagem_bala.imagem.get_rect()
+
+        self.rect.centerx = px_jogador
+        self.rect.bottom = py_jogador
+        self.vy = -10
+    def update(self):
+        self.rect.y += self.vy
+
+        if self.rect.bottom < 0:
+            self.kill()
+
 
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
@@ -75,10 +103,15 @@ class jogador(pygame.sprite.Sprite):
         if self.rect.left < 0:
             self.rect.left = 0
     
+    def tiro(self):
+        nova_bala = Bullet(imagem_bala , self.rect.top , self.rect.centerx)
+        self.all_sprites.add(nova_bala)
+        self.todas_balas.add(nova_bala)
     
 #criando navios: 
 all_sprites = pygame.sprite.Group() #É uma lista com mais funcionalidades
 all_enemies = pygame.sprite.Group()
+todas_balas = pygame.sprite.Group()
 n_inimigos = 4
 
 for i in range(n_inimigos):
@@ -109,6 +142,8 @@ while game:
                 navio_amigo.vx_jogador -= 8
             if event.key == pygame.K_RIGHT:
                 navio_amigo.vx_jogador += 8
+            if event.key == pygame.K_SPACE:
+                jogador.tiro()
         # Verifica se soltou alguma tecla.
         if event.type == pygame.KEYUP:
             # Dependendo da tecla, altera a velocidade.
@@ -125,7 +160,6 @@ while game:
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
     window.blit(imagem_fundo , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
-    
     all_sprites.draw(window)
 
     #Autaliza estado do jogo 
