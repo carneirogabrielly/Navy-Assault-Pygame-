@@ -38,8 +38,8 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(1 , 650)
         self.rect.y = 1
-        self.vx_oponente = 1.5
-        self.vy_oponente = 6
+        self.vx_oponente = 0
+        self.vy_oponente = 3
         self.all_sprites = all_sprites
     
     def update(self):
@@ -108,7 +108,11 @@ class Tiro(pygame.sprite.Sprite):
 
         # Se o tiro passar do inicio da tela, morre.
         if self.rect.bottom < 0:
-            self.kill()
+            novo_inimigo = Inimigo(imagem_oponente)
+            all_sprites.add(novo_inimigo)
+            todos_inimigos.add(novo_inimigo)
+            tirinho.kill()
+
 
 #criando navios: 
 all_sprites = pygame.sprite.Group() #É uma lista com mais funcionalidades
