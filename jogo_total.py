@@ -161,6 +161,9 @@ while game:
     
     for tirinho in todos_tiros:
         if pygame.sprite.spritecollide(tirinho, todos_inimigos, True):
+            novo_inimigo = Inimigo(imagem_oponente)
+            all_sprites.add(novo_inimigo)
+            todos_inimigos.add(novo_inimigo)
             tirinho.kill()
 
     #Gera saídas 
