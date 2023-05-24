@@ -25,6 +25,8 @@ imagem_oponente = pygame.transform.scale(imagem_oponente , (largura_oponente,com
 imagem_jogador = pygame.image.load('Imagens/Barco_jogador/Barco/Barco_amigo.png').convert_alpha()
 imagem_jogador = pygame.transform.scale(imagem_jogador , (largura_jogador,comprimento_jogador))
 imagem_tiro = pygame.image.load('Imagens/Barco_jogador/Canhões/Canhões_jogador/Segundo_canhã_jogador/Tiro_canhão2.png')
+imagem_tiro_inimigo = pygame.image.load('Imagens/Barco_inimigo/Canhões_inimigo/Tiro_canhão1.png')
+
 
 
 #----Inicializa estrutura de dados 
@@ -32,7 +34,7 @@ game = True
 
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
-    def __init__(self , imagem_oponente): #Essa classe baseia-se na entrada de uma imagem 
+    def __init__(self , imagem_oponente, all_sprites, todos_tiros_inimigos, imagem_tiro_inimigo): #Essa classe baseia-se na entrada de uma imagem 
         pygame.sprite.Sprite.__init__(self) 
         self.image = imagem_oponente
         self.rect = self.image.get_rect()
@@ -41,6 +43,8 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         self.vx_oponente = 0
         self.vy_oponente = 3
         self.all_sprites = all_sprites
+        self.todos_tiros_inimigos = todos_tiros_inimigos
+        self.imagem_tiro_inimigo = imagem_tiro_inimigo
     
     def update(self):
         #Atualizando a posição do navio 
@@ -57,6 +61,12 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         if self.rect.y > comprimento:
             self.rect.y = 1
             self.rect.x = random.randint(0 , 650)
+
+    def tiro_inimigo(self):
+    # A nova bala vai ser criada logo acima e no centro horizontal da nave
+        novo_tiro_inimigo = Tiro(self.imagem_tiro_inimigo, self.rect.top, self.rect.centerx)
+        self.all_sprites.add(novo_tiro_inimigo)
+        self.todos_tiros_inimigos.add(novo_tiro_inimigo)
 
 #criando classe pro jogador
 class jogador(pygame.sprite.Sprite):
@@ -108,7 +118,7 @@ class Tiro(pygame.sprite.Sprite):
 
         # Se o tiro passar do inicio da tela, morre.
         if self.rect.bottom < 0:
-            novo_inimigo = Inimigo(imagem_oponente)
+            novo_inimigo = Inimigo(imagem_oponente,  all_sprites, todos_tiros_inimigos,imagem_tiro_inimigo)
             all_sprites.add(novo_inimigo)
             todos_inimigos.add(novo_inimigo)
             tirinho.kill()
@@ -118,9 +128,11 @@ class Tiro(pygame.sprite.Sprite):
 all_sprites = pygame.sprite.Group() #É uma lista com mais funcionalidades
 todos_tiros = pygame.sprite.Group()
 todos_inimigos = pygame.sprite.Group()
+todos_tiros_inimigos = pygame.sprite.Group()
+
 
 for i in range(4):
-    navio_inimigo = Inimigo(imagem_oponente)
+    navio_inimigo = Inimigo(imagem_oponente, all_sprites, todos_tiros_inimigos,imagem_tiro_inimigo)
     all_sprites.add(navio_inimigo)
     todos_inimigos.add(navio_inimigo)
 
@@ -164,7 +176,7 @@ while game:
     
     for tirinho in todos_tiros:
         if pygame.sprite.spritecollide(tirinho, todos_inimigos, True):
-            novo_inimigo = Inimigo(imagem_oponente)
+            novo_inimigo = Inimigo(imagem_oponente, all_sprites, todos_tiros_inimigos,imagem_tiro_inimigo)
             all_sprites.add(novo_inimigo)
             todos_inimigos.add(novo_inimigo)
             tirinho.kill()
