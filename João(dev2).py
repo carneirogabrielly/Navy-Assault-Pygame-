@@ -12,10 +12,10 @@ pygame.display.set_caption('Navy Assault') #Coloca o título da janela
 
 
 # ---- Inicia assets (Imagem) 
-largura_oponente = 130  
-comprimento_oponente = 160
-largura_jogador = 130  
-comprimento_jogador = 160
+largura_oponente = 80
+comprimento_oponente = 100
+largura_jogador = 80
+comprimento_jogador = 100
 imagem_fundo = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
 imagem_fundo = pygame.transform.scale(imagem_fundo , (650,800)) #Converte a imagem para a escala 
 imagem_oponente = pygame.image.load('Imagens/Barco_inimigo/Barco_inimigo.png').convert_alpha()
@@ -33,10 +33,10 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         pygame.sprite.Sprite.__init__(self) 
         self.image = imagem_oponente
         self.rect = self.image.get_rect()
-        self.rect.x = random.randint(1 , 650)
+        self.rect.x = random.randint(1 , 560)
         self.rect.y = 1
-        self.vx_oponente = random.randint(-4, 4)
-        self.vy_oponente = random.randint(1, 3)
+        self.vx_oponente = 1.5
+        self.vy_oponente = 3.5
         self.all_sprites = all_sprites
     
     def update(self):
@@ -45,15 +45,15 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         self.rect.y += self.vy_oponente
 
         #Condições para reposcionar o inimigo: 
-        if self.rect.x > largura:
-            self.rect.x = largura - 10 
+        if self.rect.x >  560: 
+            self.rect.x = 560
             self.vx_oponente = self.vx_oponente * -1
-        if self.rect.x <  0:
-            self.rect.x = 1 
+        if self.rect.x < -30:
+            self.rect.x = -30
             self.vx_oponente = self.vx_oponente * -1 
         if self.rect.y > comprimento:
             self.rect.y = 1
-            self.rect.x = random.randint(0 , 650)
+            self.rect.x = random.randint(0 , 560)
 
 #criando classe pro jogador
 class jogador(pygame.sprite.Sprite):
@@ -70,10 +70,10 @@ class jogador(pygame.sprite.Sprite):
         self.rect.x += self.vx_jogador
 
         # Mantem dentro da tela
-        if self.rect.right > largura:
-            self.rect.right = largura
-        if self.rect.left < 0:
-            self.rect.left = 0
+        if self.rect.x > 595:
+            self.rect.x = 595
+        if self.rect.x < -30:
+            self.rect.x = -29
     
     
 #criando navios: 
