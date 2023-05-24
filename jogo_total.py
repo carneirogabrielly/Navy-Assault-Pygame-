@@ -33,7 +33,7 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         pygame.sprite.Sprite.__init__(self) 
         self.image = imagem_oponente
         self.rect = self.image.get_rect()
-        self.rect.x = random.randint(1 , 650)
+        self.rect.x = random.randint(1 , 550)
         self.rect.y = 1
         self.vx_oponente = 1.5
         self.vy_oponente = 6
