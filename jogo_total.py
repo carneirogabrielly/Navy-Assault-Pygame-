@@ -78,12 +78,13 @@ class jogador(pygame.sprite.Sprite):
     
 #criando navios: 
 all_sprites = pygame.sprite.Group() #É uma lista com mais funcionalidades
+all_enemies = pygame.sprite.Group()
 n_inimigos = 4
 
 for i in range(n_inimigos):
     navio = Inimigo(imagem_oponente)
     all_sprites.add(navio)
-    all_sprites.add(navio)
+    all_enemies.add(navio)
 
 navio_amigo = jogador(imagem_jogador)
 all_sprites.add(navio_amigo)
@@ -115,7 +116,10 @@ while game:
                 navio_amigo.vx_jogador += 8
             if event.key == pygame.K_RIGHT:
                 navio_amigo.vx_jogador -= 8
-
+    hits = pygame.sprite.spritecollide(navio_amigo, all_enemies , True)
+    if len(hits) > 0:
+        game = False
+    
     all_sprites.update()
 
     #Gera saídas 
