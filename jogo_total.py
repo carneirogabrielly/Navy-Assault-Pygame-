@@ -35,8 +35,8 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(1 , 650)
         self.rect.y = 1
-        self.vx_oponente = random.randint(-4, 4)
-        self.vy_oponente = random.randint(1, 3)
+        self.vx_oponente = 1,5
+        self.vy_oponente = 6
         self.all_sprites = all_sprites
     
     def update(self):
