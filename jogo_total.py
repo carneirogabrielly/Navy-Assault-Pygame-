@@ -45,11 +45,11 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         self.rect.y += self.vy_oponente
 
         #Condições para reposcionar o inimigo: 
-        if self.rect.x > largura:
-            self.rect.x = largura - 10 
+        if self.rect.x >  560: 
+            self.rect.x = 560
             self.vx_oponente = self.vx_oponente * -1
-        if self.rect.x <  0:
-            self.rect.x = 0
+        if self.rect.x < -30:
+            self.rect.x = -30
             self.vx_oponente = self.vx_oponente * -1 
         if self.rect.y > comprimento:
             self.rect.y = 1
