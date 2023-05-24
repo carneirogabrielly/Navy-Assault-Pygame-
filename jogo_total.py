@@ -12,11 +12,11 @@ pygame.display.set_caption('Navy Assault') #Coloca o título da janela
 
 
 # ---- Inicia assets (Imagem) 
-largura_oponente = 130  
-comprimento_oponente = 160
-largura_jogador = 130  
-comprimento_jogador = 160
-largura_tiro = 50
+largura_oponente = 80
+comprimento_oponente = 100
+largura_jogador = 80
+comprimento_jogador = 100
+largura_tiro = 50   
 comrpimento_tiro = 50
 imagem_fundo = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
 imagem_fundo = pygame.transform.scale(imagem_fundo , (650,800)) #Converte a imagem para a escala 
@@ -63,6 +63,7 @@ class jogador(pygame.sprite.Sprite):
     def __init__(self, imagem_jogador, all_sprites, todos_tiros, imagem_tiro):
         pygame.sprite.Sprite.__init__(self) 
         self.image = imagem_jogador
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.centerx = largura/2
         self.rect.bottom = comprimento - 10
@@ -96,6 +97,7 @@ class Tiro(pygame.sprite.Sprite):
 
         self.image = img
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
 
         # Coloca no lugar inicial definido em x, y do constutor
         self.rect.centerx = centerx
@@ -156,11 +158,11 @@ while game:
 
     all_sprites.update()
 
-    if pygame.sprite.spritecollide(navio_amigo, todos_inimigos, True):
+    if pygame.sprite.spritecollide(navio_amigo, todos_inimigos, True, pygame.sprite.collide_mask):
         game = False
     
     for tirinho in todos_tiros:
-        if pygame.sprite.spritecollide(tirinho, todos_inimigos, True):
+        if pygame.sprite.spritecollide(tirinho, todos_inimigos, True, pygame.sprite.collide_mask)  :
             novo_inimigo = Inimigo(imagem_oponente)
             all_sprites.add(novo_inimigo)
             todos_inimigos.add(novo_inimigo)
