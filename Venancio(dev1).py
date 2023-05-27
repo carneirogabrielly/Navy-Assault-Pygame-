@@ -45,6 +45,10 @@ imagem_tiro = pygame.transform.scale(imagem_tiro , (largura_tiro , comrpimento_t
 imagem_tiro_inimigo = pygame.image.load('Imagens/Barco_jogador/Canhões/Canhões_jogador/Quarto_canhão_jogador/Tiro_canhão4.png')
 imagem_tiro_inimigo = pygame.transform.scale(imagem_tiro_inimigo , (largura_tiro , comrpimento_tiro))
 
+imagem_placar = pygame.image.load('Imagens/Foto_placar.png')
+imagem_placar = pygame.transform.scale(imagem_placar , (100, 100))
+
+fonte_placar = pygame.font.SysFont('arial' , 28 , True , True)
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , imagem_oponente , all_sprites , todos_tiros_inimigo , imagem_tiro_oponente): #Essa classe baseia-se na entrada de uma imagem 
@@ -53,7 +57,7 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(1 , 560)
         self.rect.y = 1
-        self.vx_oponente = 1.5
+        self.vx_oponente = random.randint(-2 , 2 )
         self.vy_oponente = 3.5
         self.all_sprites = all_sprites
         self.todos_tiros_inimigo = todos_tiros_inimigo
@@ -147,7 +151,7 @@ class Tiro_inimigo(pygame.sprite.Sprite):
         # Coloca no lugar inicial definido em x, y do constutor
         self.rect.centerx = centerx
         self.rect.bottom = bottom +20
-        self.speedy = 10  # Velocidade fixa para cima
+        self.speedy = 5  # Velocidade fixa para cima
 
     def update(self):
         # A bala só se move no eixo y
@@ -162,6 +166,8 @@ class Tiro_inimigo(pygame.sprite.Sprite):
 game = True
 #quantidade de vidas do jogador
 vidas = 3
+#placar
+placar = 0 
 
 #criando navios: 
 
@@ -217,27 +223,35 @@ while game:
 
     if pygame.sprite.spritecollide(navio_amigo, todos_inimigos, True, pygame.sprite.collide_mask):
         vidas -= 1
+        placar -= 1000
     for tirinho in todos_tiros:
         if pygame.sprite.spritecollide(tirinho, todos_inimigos, True, pygame.sprite.collide_mask)  :
             novo_inimigo = Inimigo(imagem_oponente , all_sprites , todos_tiros_inimigo , imagem_tiro_inimigo)
             all_sprites.add(novo_inimigo)
             todos_inimigos.add(novo_inimigo)
             tirinho.kill() 
-    
+            placar += 100
     if pygame.sprite.spritecollide(navio_amigo, todos_tiros_inimigo, True, pygame.sprite.collide_mask):
         vidas -= 1
-
+        placar -= 500
 
     if vidas == 0:
         game = False 
 
+    if placar < 0:
+        game = False
 
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
     window.blit(imagem_fundo , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
+    window.blit(imagem_placar , (550 , 5))
     all_sprites.draw(window)
+
+    #Colocando placar
+    superficie_placar = fonte_placar.render("{0}".format(placar) , True , (255 , 255 , 255))
+    window.blit(superficie_placar , (560 , 40))
 
     #Autaliza estado do jogo 
     pygame.display.update() #Atualiza o estado do jogo observado a cada loop
 #--- Finalização 
-pygame.quit() #Finaliza o game   
+pygame.quit() #Finaliza o game     
