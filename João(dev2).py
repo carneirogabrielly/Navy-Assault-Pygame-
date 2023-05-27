@@ -45,6 +45,7 @@ imagem_tiro = pygame.transform.scale(imagem_tiro , (largura_tiro , comrpimento_t
 imagem_tiro_inimigo = pygame.image.load('Imagens/Barco_jogador/Canhões/Canhões_jogador/Quarto_canhão_jogador/Tiro_canhão4.png')
 imagem_tiro_inimigo = pygame.transform.scale(imagem_tiro_inimigo , (largura_tiro , comrpimento_tiro))
 
+imagem_vida = pygame.transform.scale(imagem_jogador, (largura_vida, comprimento_vida)).convert_alpha()
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , imagem_oponente , all_sprites , todos_tiros_inimigo , imagem_tiro_oponente): #Essa classe baseia-se na entrada de uma imagem 
@@ -240,4 +241,4 @@ while game:
     #Autaliza estado do jogo 
     pygame.display.update() #Atualiza o estado do jogo observado a cada loop
 #--- Finalização 
-pygame.quit() #Finaliza o game   
+pygame.quit() #Finaliza o game  
