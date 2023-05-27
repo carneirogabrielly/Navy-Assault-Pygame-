@@ -48,7 +48,7 @@ imagem_tiro_inimigo = pygame.transform.scale(imagem_tiro_inimigo , (largura_tiro
 imagem_placar = pygame.image.load('Imagens/Foto_placar.png')
 imagem_placar = pygame.transform.scale(imagem_placar , (100, 100))
 
-fonte_placar = pygame.font.SysFont('arial' , 28 , True , True)
+fonte_placar = pygame.font.SysFont('cooper black' , 28 , True , False)
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , imagem_oponente , all_sprites , todos_tiros_inimigo , imagem_tiro_oponente): #Essa classe baseia-se na entrada de uma imagem 
@@ -238,8 +238,6 @@ while game:
     if vidas == 0:
         game = False 
 
-    if placar < 0:
-        game = False
 
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
