@@ -12,13 +12,24 @@ pygame.display.set_caption('Navy Assault') #Coloca o título da janela
 
 
 # ---- Inicia assets (Imagem) 
+#tamanho imagem oponente
 largura_oponente = 80
 comprimento_oponente = 100
+
+#Tamanho imagem jogador
 largura_jogador = 80
 comprimento_jogador = 100
-largura_tiro = 50  
-comrpimento_tiro = 50
 
+#Tamanho tiros 
+largura_tiro = 35
+comrpimento_tiro = 35 
+
+#Tamanho vidas
+largura_vida = 10
+comprimento_vida = 10
+
+
+#Imagens
 imagem_fundo = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
 imagem_fundo = pygame.transform.scale(imagem_fundo , (650,800)) #Converte a imagem para a escala 
 
@@ -31,11 +42,8 @@ imagem_jogador = pygame.transform.scale(imagem_jogador , (largura_jogador,compri
 imagem_tiro = pygame.image.load('Imagens/Barco_jogador/Canhões/Canhões_jogador/Segundo_canhã_jogador/Tiro_canhão2.png')
 imagem_tiro = pygame.transform.scale(imagem_tiro , (largura_tiro , comrpimento_tiro) )
 
-imagem_tiro_inimigo = pygame.image.load('Imagens/Barco_inimigo/Canhões_inimigo/Tiro_canhão1.png')
+imagem_tiro_inimigo = pygame.image.load('Imagens/Barco_jogador/Canhões/Canhões_jogador/Quarto_canhão_jogador/Tiro_canhão4.png')
 imagem_tiro_inimigo = pygame.transform.scale(imagem_tiro_inimigo , (largura_tiro , comrpimento_tiro))
-
-#----Inicializa estrutura de dados 
-game = True
 
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
@@ -66,7 +74,7 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
             self.rect.y = 1
             self.rect.x = random.randint(0 , 560)
     def tiro_inimigo(self):
-        novo_tiro_inimigo = Tiro_inimigo(imagem_tiro_inimigo , self.rect.top , self.rect.centerx)
+        novo_tiro_inimigo = Tiro_inimigo(imagem_tiro_inimigo , self.rect.bottom  , self.rect.centerx)
         self.all_sprites.add(novo_tiro_inimigo)
         self.todos_tiros_inimigo.add(novo_tiro_inimigo)
 
@@ -149,6 +157,12 @@ class Tiro_inimigo(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
+
+#----Inicializa estrutura de dados 
+game = True
+#quantidade de vidas do jogador
+vidas = 3
+
 #criando navios: 
 
 all_sprites = pygame.sprite.Group() #É uma lista com mais funcionalidades
@@ -202,13 +216,22 @@ while game:
     all_sprites.update()
 
     if pygame.sprite.spritecollide(navio_amigo, todos_inimigos, True, pygame.sprite.collide_mask):
-        game = False
+        vidas -= 1
     for tirinho in todos_tiros:
         if pygame.sprite.spritecollide(tirinho, todos_inimigos, True, pygame.sprite.collide_mask)  :
             novo_inimigo = Inimigo(imagem_oponente , all_sprites , todos_tiros_inimigo , imagem_tiro_inimigo)
             all_sprites.add(novo_inimigo)
             todos_inimigos.add(novo_inimigo)
             tirinho.kill() 
+    
+    if pygame.sprite.spritecollide(navio_amigo, todos_tiros_inimigo, True, pygame.sprite.collide_mask):
+        vidas -= 1
+
+
+    if vidas == 0:
+        game = False 
+
+
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
     window.blit(imagem_fundo , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
