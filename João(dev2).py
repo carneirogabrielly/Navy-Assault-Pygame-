@@ -81,8 +81,8 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         self.rect.y += self.vy_oponente
 
         #Condições para reposcionar o inimigo: 
-        if self.rect.x > 560:
-            self.rect.x = 560
+        if self.rect.x > 595:
+            self.rect.x = 595
             self.vx_oponente = self.vx_oponente * -1
         if self.rect.x <  -30:
             self.rect.x = -30 
@@ -194,7 +194,7 @@ class canhao_anim(pygame.sprite.Sprite):
         self.ultima_vez = pygame.time.get_ticks()
 
 
-        self.temporizador = 100  
+        self.temporizador = 25  
 
     def update(self):
         agora = pygame.time.get_ticks()
