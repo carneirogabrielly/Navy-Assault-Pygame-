@@ -3,7 +3,7 @@ import random
 import time
 
 pygame.init() #Inicializa o framework do pygame 
-
+pygame.mixer.init()
 #---Gera tela principal 
 largura = 650 # Largura da tela 
 comprimento = 800 #Comprimento da tela 
@@ -84,6 +84,23 @@ for i in range(23):
     anim_explod_inimigo.append(imagem)
 
 assets['anim_explod_inimigo'] = anim_explod_inimigo
+
+
+#Sons 
+
+
+pygame.mixer.music.load('Sons/Música_fundo.mp3')
+pygame.mixer.music.set_volume(0.05)
+assets['som do tiro do jogador'] = pygame.mixer.Sound('Sons/tiro_jogador.ogg')
+assets['som do tiro do jogador'].set_volume(0.01)
+assets['som do tiro do inimigo'] = pygame.mixer.Sound('Sons/tiro_oponente.wav')
+assets['som do tiro do inimigo'].set_volume(0.01)
+assets['som da explosão do jogador'] = pygame.mixer.Sound('Sons/explosão_barco.wav')
+assets['som da explosão do jogador'].set_volume(0.05)
+assets['som da explosão do inimigo'] = pygame.mixer.Sound('Sons/Inimigo_explodindo.ogg')
+assets['som da explosão do inimigo'].set_volume(0.05)
+
+
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , assets , all_sprites , todos_tiros_inimigo): #Essa classe baseia-se na entrada de uma imagem 
@@ -359,6 +376,7 @@ while game:
     if tempo_inimigo == 50: 
         for i in todos_inimigos: 
             i.tiro_inimigo()
+            assets['som do tiro do inimigo'].play()
         tempo_inimigo = 0 
     # ----- Trata eventos
     for event in pygame.event.get(): #pygame.evente.get devolve uma lista com todos os eventos que ocorreram desde a última janela 
@@ -374,6 +392,7 @@ while game:
                 navio_amigo.vx_jogador += 8
             if event.key == pygame.K_SPACE:
                 navio_amigo.tiro()
+                assets['som do tiro do jogador'].play()
                 tiro = canhao_anim(navio_amigo.rect.centerx,navio_amigo.vx_jogador, assets)
                 all_sprites.add(tiro)
 
@@ -393,8 +412,10 @@ while game:
         todos_inimigos.add(novo_inimigo)
         vidas -= 1
         placar -= 1000
+        assets['som da explosão do inimigo'].play()
     hit_navio = pygame.sprite.groupcollide(todos_inimigos, todos_tiros, True, True, pygame.sprite.collide_mask)
     for navio in hit_navio:
+        assets['som da explosão do inimigo'].play()
         novo_inimigo = Inimigo(assets , all_sprites , todos_tiros_inimigo)
         all_sprites.add(novo_inimigo)
         todos_inimigos.add(novo_inimigo)
@@ -413,7 +434,7 @@ while game:
         morte_jogador = explo_jogador(navio_amigo.rect.center, assets)
         all_sprites.add(morte_jogador)
         navio_amigo.kill()
-        
+        assets['som da explosão do jogador'].play()
     
 
     #Gera saídas 
