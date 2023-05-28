@@ -1,5 +1,7 @@
 import pygame 
-import random 
+import random
+
+
 
 pygame.init() #Inicializa o framework do pygame 
 
@@ -47,8 +49,12 @@ imagem_tiro_inimigo = pygame.transform.scale(imagem_tiro_inimigo , (largura_tiro
 
 imagem_placar = pygame.image.load('Imagens/Foto_placar.png')
 imagem_placar = pygame.transform.scale(imagem_placar , (100, 100))
-
 fonte_placar = pygame.font.SysFont('cooper black' , 28 , True , False)
+
+imagem_vida = pygame.image.load('Imagens/Barco_jogador/Barco/Barco_amigo.png').convert_alpha()
+imagem_vida = pygame.transform.scale(imagem_jogador , (largura_vida,comprimento_vida))
+
+
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , imagem_oponente , all_sprites , todos_tiros_inimigo , imagem_tiro_oponente): #Essa classe baseia-se na entrada de uma imagem 
@@ -161,11 +167,9 @@ class Tiro_inimigo(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
-
 #----Inicializa estrutura de dados 
 game = True
-#quantidade de vidas do jogador
-vidas = 3
+vidas = 3 
 #placar
 placar = 0 
 

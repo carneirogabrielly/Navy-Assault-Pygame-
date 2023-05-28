@@ -155,71 +155,6 @@ class Tiro(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
-class Tiro_inimigo(pygame.sprite.Sprite):
-    # Construtor da classe.
-
-    def __init__(self, img, bottom, centerx):
-        # Construtor da classe mãe (Sprite).
-        pygame.sprite.Sprite.__init__(self)
-
-        self.image = img
-        self.rect = self.image.get_rect()
-        self.mask = pygame.mask.from_surface(self.image)
-
-        # Coloca no lugar inicial definido em x, y do constutor
-        self.rect.centerx = centerx
-        self.rect.bottom = bottom +20
-        self.speedy = 5  # Velocidade fixa para cima
-
-    def update(self):
-        # A bala só se move no eixo y
-        self.rect.y += self.speedy
-
-        # Se o tiro passar do inicio da tela, morre.
-        if self.rect.bottom < 0:
-            self.kill()
-
-
-class canhao_anim(pygame.sprite.Sprite):
-    def __init__(self,centro,assets):
-        pygame.sprite.Sprite.__init__(self)
-
-        self.animacao = assets['anim_tiro_jogador']
-
-        self.frame = 0
-        self.image = self.animacao[self.frame]
-        self.rect = self.image.get_rect()
-        self.rect.center =  centro
-
-        self.ultima_vez = pygame.time.get_ticks()
-
-
-        self.temporizador = 25  
-
-    def update(self):
-        agora = pygame.time.get_ticks()
-
-
-        tempo_decorrido = agora - self.temporizador
-
-        if tempo_decorrido > self.temporizador:
-
-            self.ultima_vez = agora
-
-
-            self.frame += 1
-
-        if self.frame == len(assets['anim_tiro_jogador']):
-            self.kill()
-
-        else:
-            centro = self.rect.center
-            self.image = self.animacao[self.frame]
-            self.rect = self.image.get_rect()
-            self.rect.center =  centro
-            
-
-
 #----Inicializa estrutura de dados 
 game = True
 #quantidade de vidas do jogador
@@ -270,8 +205,6 @@ while game:
                 navio_amigo.vx_jogador += 8
             if event.key == pygame.K_SPACE:
                 navio_amigo.tiro()
-                tiro = canhao_anim(navio_amigo.rect.center, assets)
-                all_sprites.add(tiro)
 
         # Verifica se soltou alguma tecla.
         if event.type == pygame.KEYUP:
