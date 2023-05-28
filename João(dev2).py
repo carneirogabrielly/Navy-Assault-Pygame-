@@ -62,6 +62,16 @@ for i in range(3):
     anim_tiro_jogador.append(imagem)
 
 assets['anim_tiro_jogador'] = anim_tiro_jogador
+
+anim_explosion_barco_amigo = []
+for i in range(27):
+    arquivo2 = f'Imagens/Barco_jogador/Barco/animação-destruição/{i}.png'
+
+    imagem = pygame.image.load(arquivo2).convert_alpha()
+    imagem = pygame.transform.scale(imagem,(110,110))
+    anim_explosion_barco_amigo.append(imagem)
+
+assets['anim_explosion_barco_amigo'] = anim_explosion_barco_amigo
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , assets , all_sprites , todos_tiros_inimigo): #Essa classe baseia-se na entrada de uma imagem 
@@ -117,8 +127,8 @@ class jogador(pygame.sprite.Sprite):
         # Mantem dentro da tela
         if self.rect.x > 595:
             self.rect.x = 595
-        if self.rect.x < -60:
-            self.rect.x = -59
+        if self.rect.x < -30:
+            self.rect.x = -29
             
     def tiro(self):
     # A nova bala vai ser criada logo acima e no centro horizontal da nave
@@ -179,7 +189,7 @@ class Tiro_inimigo(pygame.sprite.Sprite):
 
 
 class canhao_anim(pygame.sprite.Sprite):
-    def __init__(self,centro,assets,velocidadex):
+    def __init__(self, centrox, velocidadex, assets):
         pygame.sprite.Sprite.__init__(self)
 
         self.animacao = assets['anim_tiro_jogador']
@@ -187,7 +197,8 @@ class canhao_anim(pygame.sprite.Sprite):
         self.image = self.animacao[self.frame]
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
-        self.rect.center =  centro
+        self.rect.centerx =  centrox 
+        self.rect.centery = comprimento - 10  
         self.speedx = velocidadex
         self.ultima_vez = pygame.time.get_ticks()
 
@@ -211,10 +222,57 @@ class canhao_anim(pygame.sprite.Sprite):
             self.kill()
 
         else:
-            centro = self.rect.center
+
+            centrox = self.rect.centerx + self.speedx
             self.image = self.animacao[self.frame]
             self.rect = self.image.get_rect()
-            self.rect.center =  centro
+            self.rect.centerx =  centrox
+            self.rect.centery = comprimento - 60
+
+            if self.rect.x > 595:
+                self.rect.x = 595
+            if self.rect.x < -30:
+                self.rect.x = -29
+                
+
+class explo_jogador(pygame.sprite.Sprite):
+   def __init__(self, centrox, assets):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.animacao = assets['anim_explosion_barco_amigo']
+        self.frame = 0
+        self.image = self.animacao[self.frame]
+        self.rect = self.image.get_rect()
+        self.rect.centerx =  centrox 
+        self.rect.centery = comprimento - 10  
+        self.ultima_vez = pygame.time.get_ticks()
+
+
+        self.temporizador = 100
+
+   def update(self):
+        agora = pygame.time.get_ticks()
+
+
+        tempo_decorrido = agora - self.temporizador
+
+        if tempo_decorrido > self.temporizador:
+
+            self.ultima_vez = agora
+
+
+            self.frame += 1
+
+        if self.frame == len(assets['anim_tiro_jogador']):
+            self.kill()
+
+        else:
+
+            centrox = self.rect.centerx
+            self.image = self.animacao[self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.centerx =  centrox
+
             
 
 
@@ -268,7 +326,7 @@ while game:
                 navio_amigo.vx_jogador += 8
             if event.key == pygame.K_SPACE:
                 navio_amigo.tiro()
-                tiro = canhao_anim(navio_amigo.rect.center, assets)
+                tiro = canhao_anim(navio_amigo.rect.centerx,navio_amigo.vx_jogador, assets)
                 all_sprites.add(tiro)
 
         # Verifica se soltou alguma tecla.
@@ -303,7 +361,9 @@ while game:
         placar -= 500
 
     if vidas == 0:
-        game = False 
+        #morte_jogador = explo_jogador(navio.rect.centerx, assets)
+        #all_sprites.add(morte_jogador)
+        game = False
     
 
     #Gera saídas 
