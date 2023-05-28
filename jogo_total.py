@@ -1,5 +1,6 @@
 import pygame 
 import random 
+import time
 
 pygame.init() #Inicializa o framework do pygame 
 
@@ -57,11 +58,32 @@ anim_tiro_jogador = []
 
 for i in range(3):
     arquivo = f'Imagens/Barco_jogador/Barco/anim_barco_jogador_{i}.png '
-    imagem = pygame.image.load(arquivo).convert()
+    imagem = pygame.image.load(arquivo).convert_alpha()
     imagem = pygame.transform.scale(imagem,(largura_jogador,comprimento_jogador))
     anim_tiro_jogador.append(imagem)
 
 assets['anim_tiro_jogador'] = anim_tiro_jogador
+
+anim_explosion_barco_amigo = []
+for i in range(27):
+    arquivo2 = f'Imagens/Barco_jogador/Barco/animação-destruição/{i}.png'
+
+    imagem = pygame.image.load(arquivo2).convert_alpha()
+    imagem = pygame.transform.scale(imagem,(110,110))
+    anim_explosion_barco_amigo.append(imagem)
+
+assets['anim_explosion_barco_amigo'] = anim_explosion_barco_amigo
+
+anim_explod_inimigo = []
+
+for i in range(23):
+    arquivo3 = f'Imagens/Barco_inimigo/explod_inimigo/{i}.png'
+
+    imagem = pygame.image.load(arquivo3).convert_alpha()
+    imagem = pygame.transform.scale(imagem, (110,110))
+    anim_explod_inimigo.append(imagem)
+
+assets['anim_explod_inimigo'] = anim_explod_inimigo
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , assets , all_sprites , todos_tiros_inimigo): #Essa classe baseia-se na entrada de uma imagem 
@@ -117,8 +139,8 @@ class jogador(pygame.sprite.Sprite):
         # Mantem dentro da tela
         if self.rect.x > 595:
             self.rect.x = 595
-        if self.rect.x < -60:
-            self.rect.x = -59
+        if self.rect.x < -30:
+            self.rect.x = -29
             
     def tiro(self):
     # A nova bala vai ser criada logo acima e no centro horizontal da nave
@@ -126,9 +148,7 @@ class jogador(pygame.sprite.Sprite):
         self.all_sprites.add(novo_tiro)
         self.todos_tiros.add(novo_tiro)
 
-    def canhao(self):
-        tiro = canhao_anim(jogador.rect.center , assets)
-        all_sprites.add(tiro)
+     
 
     
 class Tiro(pygame.sprite.Sprite):
@@ -154,6 +174,155 @@ class Tiro(pygame.sprite.Sprite):
         # Se o tiro passar do inicio da tela, morre.
         if self.rect.bottom < 0:
             self.kill()
+
+class Tiro_inimigo(pygame.sprite.Sprite):
+    # Construtor da classe.
+
+    def __init__(self, img, bottom, centerx):
+        # Construtor da classe mãe (Sprite).
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+
+        # Coloca no lugar inicial definido em x, y do constutor
+        self.rect.centerx = centerx
+        self.rect.bottom = bottom +20
+        self.speedy = 5  # Velocidade fixa para cima
+
+    def update(self):
+        # A bala só se move no eixo y
+        self.rect.y += self.speedy
+
+        # Se o tiro passar do inicio da tela, morre.
+        if self.rect.bottom < 0:
+            self.kill()
+
+
+class canhao_anim(pygame.sprite.Sprite):
+    def __init__(self, centrox, velocidadex, assets):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.animacao = assets['anim_tiro_jogador']
+        self.frame = 0
+        self.image = self.animacao[self.frame]
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.centerx =  centrox 
+        self.rect.centery = comprimento - 10  
+        self.speedx = velocidadex
+        self.ultima_vez = pygame.time.get_ticks()
+
+
+        self.temporizador = 10 
+
+    def update(self):
+        agora = pygame.time.get_ticks()
+
+
+        tempo_decorrido = agora - self.temporizador
+
+        if tempo_decorrido > self.temporizador:
+
+            self.ultima_vez = agora
+
+
+            self.frame += 1
+
+        if self.frame == len(assets['anim_tiro_jogador']):
+            self.kill()
+
+        else:
+
+            centrox = self.rect.centerx + self.speedx
+            self.image = self.animacao[self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.centerx =  centrox
+            self.rect.centery = comprimento - 60
+
+            if self.rect.x > 595:
+                self.rect.x = 595
+            if self.rect.x < -30:
+                self.rect.x = -29
+                
+
+class explo_jogador(pygame.sprite.Sprite):
+   def __init__(self, centro, assets):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.explosao = assets['anim_explosion_barco_amigo']
+        self.frame = 0
+        self.image = self.explosao[self.frame]
+        self.rect = self.image.get_rect()
+        self.rect.center = centro
+        self.ultima_vez = pygame.time.get_ticks()
+
+
+        self.temporizador = 2
+
+   def update(self):
+        agora = pygame.time.get_ticks()
+
+
+        tempo_decorrido = agora - self.temporizador
+
+        if tempo_decorrido > self.temporizador:
+
+            self.ultima_vez = agora
+
+
+            self.frame += 1
+
+        if self.frame == len(self.explosao):
+            self.kill()
+
+        else:
+
+            centro = self.rect.center
+            self.image = self.explosao[self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.center =  centro
+
+class explod_inimigo(pygame.sprite.Sprite):
+   def __init__(self, centro, assets):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.explosao = assets['anim_explod_inimigo']
+        self.frame = 0
+        self.image = self.explosao[self.frame]
+        self.rect = self.image.get_rect()
+        self.rect.center = centro
+        self.ultima_vez = pygame.time.get_ticks()
+
+
+        self.temporizador = 2
+
+   def update(self):
+        agora = pygame.time.get_ticks()
+
+
+        tempo_decorrido = agora - self.temporizador
+
+        if tempo_decorrido > self.temporizador:
+
+            self.ultima_vez = agora
+
+
+            self.frame += 1
+
+        if self.frame == len(self.explosao):
+            self.kill()
+
+        else:
+
+            centro = self.rect.center
+            self.image = self.explosao[self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.center =  centro
+
+            
+
 
 #----Inicializa estrutura de dados 
 game = True
@@ -205,6 +374,8 @@ while game:
                 navio_amigo.vx_jogador += 8
             if event.key == pygame.K_SPACE:
                 navio_amigo.tiro()
+                tiro = canhao_anim(navio_amigo.rect.centerx,navio_amigo.vx_jogador, assets)
+                all_sprites.add(tiro)
 
         # Verifica se soltou alguma tecla.
         if event.type == pygame.KEYUP:
@@ -222,23 +393,27 @@ while game:
         todos_inimigos.add(novo_inimigo)
         vidas -= 1
         placar -= 1000
-    for tirinho in todos_tiros:
-        if pygame.sprite.spritecollide(tirinho, todos_inimigos, True, pygame.sprite.collide_mask)  :
-            novo_inimigo = Inimigo(assets , all_sprites , todos_tiros_inimigo)
-            all_sprites.add(novo_inimigo)
-            todos_inimigos.add(novo_inimigo)
-            tirinho.kill() 
-            placar += 100
-            if placar % 500 == 0 and placar > 0:
-                if placar / 500 not in vidas_ganhas:
-                    vidas += 1
-                    vidas_ganhas.append(placar / 500)
+    hit_navio = pygame.sprite.groupcollide(todos_inimigos, todos_tiros, True, True, pygame.sprite.collide_mask)
+    for navio in hit_navio:
+        novo_inimigo = Inimigo(assets , all_sprites , todos_tiros_inimigo)
+        all_sprites.add(novo_inimigo)
+        todos_inimigos.add(novo_inimigo)
+        morte_inimigo = explod_inimigo(navio.rect.center, assets)
+        all_sprites.add(morte_inimigo)
+        placar += 100
+        if placar % 500 == 0 and placar > 0:
+            if placar / 500 not in vidas_ganhas:
+                vidas += 1
+                vidas_ganhas.append(placar / 500)
     if pygame.sprite.spritecollide(navio_amigo, todos_tiros_inimigo, True, pygame.sprite.collide_mask):
         vidas -= 1
         placar -= 500
 
     if vidas == 0:
-        game = False 
+        morte_jogador = explo_jogador(navio_amigo.rect.center, assets)
+        all_sprites.add(morte_jogador)
+        navio_amigo.kill()
+        
     
 
     #Gera saídas 
