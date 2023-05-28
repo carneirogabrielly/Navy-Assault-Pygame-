@@ -57,7 +57,7 @@ anim_tiro_jogador = []
 
 for i in range(3):
     arquivo = f'Imagens/Barco_jogador/Barco/anim_barco_jogador_{i}.png '
-    imagem = pygame.image.load(arquivo).convert()
+    imagem = pygame.image.load(arquivo).convert_alpha()
     imagem = pygame.transform.scale(imagem,(largura_jogador,comprimento_jogador))
     anim_tiro_jogador.append(imagem)
 
@@ -126,9 +126,7 @@ class jogador(pygame.sprite.Sprite):
         self.all_sprites.add(novo_tiro)
         self.todos_tiros.add(novo_tiro)
 
-    def canhao(self):
-        tiro = canhao_anim(jogador.rect.center , assets)
-        all_sprites.add(tiro)
+     
 
     
 class Tiro(pygame.sprite.Sprite):
@@ -181,20 +179,20 @@ class Tiro_inimigo(pygame.sprite.Sprite):
 
 
 class canhao_anim(pygame.sprite.Sprite):
-    def __init__(self,centro,assets):
+    def __init__(self,centro,assets,velocidadex):
         pygame.sprite.Sprite.__init__(self)
 
         self.animacao = assets['anim_tiro_jogador']
-
         self.frame = 0
         self.image = self.animacao[self.frame]
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.center =  centro
-
+        self.speedx = velocidadex
         self.ultima_vez = pygame.time.get_ticks()
 
 
-        self.temporizador = 25  
+        self.temporizador = 10 
 
     def update(self):
         agora = pygame.time.get_ticks()
