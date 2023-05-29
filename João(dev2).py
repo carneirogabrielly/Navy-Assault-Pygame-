@@ -97,6 +97,17 @@ for i in range(3):
 assets['anim_tiro_inimigo'] = anim_tiro_inimigo2
 
 
+anim_dano = []
+
+for i in range(3):
+    arquivo5 = f'Imagens/Barco_jogador/Barco/Barco_danificado/{i}.png'
+    imagem = pygame.image.load(arquivo5).convert_alpha()
+    imagem = pygame.transform.scale(imagem, (largura_jogador, comprimento_jogador))
+    anim_dano.append(imagem)
+
+assets['anim_dano'] = anim_dano
+
+
 #Sons 
 
 
@@ -181,6 +192,11 @@ class jogador(pygame.sprite.Sprite):
         novo_tiro = Tiro(self.imagem_tiro, self.rect.top, self.rect.centerx)
         self.all_sprites.add(novo_tiro)
         self.todos_tiros.add(novo_tiro)
+
+
+    def dano(self):
+        tomou_dano = anim_danos(self.rect.centerx, self.vx_jogador, assets)
+        self.all_sprites.add(tomou_dano)
 
      
 
@@ -407,6 +423,54 @@ class canhao_inimigo_anim(pygame.sprite.Sprite):
                 self.rect.x = 595#Reposiciona a animação
             if self.rect.x < -30:#Verifica se a animação passou do limite negativo da tela 
                 self.rect.x = -29#Reposiciona a animação
+
+
+class anim_danos(pygame.sprite.Sprite):
+
+    def __init__(self, centrox, velocidadex, assets):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.dano = assets['anim_dano']
+        self.frame = 0
+        self.image = self.dano[self.frame]
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.centerx =  centrox 
+        self.rect.centery = comprimento - 60  #Captura a posição do centro do retangulo da imagem no eixo 'y'
+        self.speedx = velocidadex #Define a velocidade da animação(para acompanhar o barco após o tiro)
+        self.ultima_vez = pygame.time.get_ticks()#Captura o tempo da animação
+
+
+        self.temporizador = 2 #Tempo necessário para que rode outra animação
+
+    def update(self):#Atualiza a classe
+        agora = pygame.time.get_ticks()#Captura o tempo atual 
+
+
+        tempo_decorrido = agora - self.temporizador#Verifica o tempo decorrido
+
+        if tempo_decorrido > self.temporizador:#condição para que a animação continue a rodar 
+
+            self.ultima_vez = agora #Captura o tempo da ultima animação
+
+
+            self.frame += 1 #Atualiza a imagem que será usada
+
+        if self.frame == len(assets['anim_dano']): #verifica se está na ultima imagem
+            self.kill()#finaliza a animação
+
+        else:
+            centrox = self.rect.centerx + self.speedx
+            self.image = self.dano[self.frame]#Define nova imagem
+            self.rect = self.image.get_rect()#Captura o espaço retangular da imagem
+            self.rect.centerx =  centrox #Define a posição do centro da imagem no eixo 'x'
+            self.rect.centery = comprimento - 60 # Define a posição do centro da imagem no eixo 'y'
+
+            if self.rect.x > 595:#Verifica se a animação passou do limite positivo da tela
+                self.rect.x = 595#Reposiciona a animação
+            if self.rect.x < -30:#Verifica se a animação passou do limite negativo da tela 
+                self.rect.x = -29#Reposiciona a animação
+                
             
 
 
@@ -456,28 +520,37 @@ FPS = 50#quantidade de imagens que são mostradas na tela por segundo
 tempo_inimigo = 0 #tempo em que o inimigo ira atirar 
 #----Loop principal do jogo ---
 while game: 
+
     clock.tick(FPS) 
+
     tempo_inimigo += 1 #adiciona tempo ao ocntador 
     if tempo_inimigo == 50:#verifica se já passou  o tempo necessário para o inimigo atirar 
+
         for i in todos_inimigos: #loop para acessar todos os inimigos dentro da lista
+
             i.tiro_inimigo()#faz o inimigo atirar 
             assets['som do tiro do inimigo'].play()#roda o som do tiro 
             anim_tiro2 = canhao_inimigo_anim(i.rect.centerx, i.rect.centery, i.vx_oponente,i.vy_oponente,  assets)
             all_sprites.add(anim_tiro2)
         tempo_inimigo = 0 #reinicia o contador de tempo após atirar 
-    # ----- Trata eventos
+
+    # ----- Trata eventos ------ #
     for event in pygame.event.get(): #pygame.evente.get devolve uma lista com todos os eventos que ocorreram desde a última janela 
         # ----- Verifica consequências
-        if event.type == pygame.QUIT: #Se o comando do evento for igual a pygame.quit, o loop acaba 
+        if event.type == pygame.QUIT: #Se o comando do evento for igual a pygame.quit, o loop acaba
+            
             game = False#finaliza o jogo 
         # Verifica se apertou alguma tecla.
         if event.type == pygame.KEYDOWN:
             # Dependendo da tecla, altera a velocidade.
             if event.key == pygame.K_LEFT:#verifica a telca apertada 
+
                 navio_amigo.vx_jogador -= 8#Faz o jogador se movimenta para a esquerda 
             if event.key == pygame.K_RIGHT:#verifica a tecla apertada 
+
                 navio_amigo.vx_jogador += 8#faz o jogador se movimentar para a direita 
             if event.key == pygame.K_SPACE:#verifica a tecla apertada 
+
                 navio_amigo.tiro()#Faz o navio do jogador atirar 
                 assets['som do tiro do jogador'].play()#roda o som do tiro do jogador 
                 tiro = canhao_anim(navio_amigo.rect.centerx,navio_amigo.vx_jogador, assets)#realiza a animação de tiro do jogador 
@@ -487,21 +560,30 @@ while game:
         if event.type == pygame.KEYUP:
             # Dependendo da tecla, altera a velocidade.
             if event.key == pygame.K_LEFT:#verifica tecla apertada 
+
                 navio_amigo.vx_jogador += 8#Faz o jogador parar após soltar a tecla 
             if event.key == pygame.K_RIGHT:#verifica tecla apertada 
+
                 navio_amigo.vx_jogador -= 8#faz o jogador parar após soltar a telca 
 
     all_sprites.update()#atualiza todos os eventos dos sprites dentro dos grupos 
 
     if pygame.sprite.spritecollide(navio_amigo, todos_inimigos, True, pygame.sprite.collide_mask):#verifica se houve colizão entre o jogador e algum inimigo
+
+
         novo_inimigo = Inimigo(assets , groups)#cria inimigo novamente 
         all_sprites.add(novo_inimigo)#Adiciona sprite do inimigo no grupo de todos os sprites 
         todos_inimigos.add(novo_inimigo)#Adiciona sprite do inimigo no grupo de sprites dos inimigos 
         vidas -= 1#Diminui a quantidade de vida do jogador 
         placar -= 1000#Reduz a pontuação do jogador 
         assets['som da explosão do inimigo'].play()#Roda o som da explosão do inimigo
+        navio_amigo.dano()
+        
+
+
     hit_navio = pygame.sprite.groupcollide(groups['todos_inimigos'], groups['todos_tiros'], True, True, pygame.sprite.collide_mask)#Armazena todos os inimigos que foram acertados por tiros 
     for navio in hit_navio:#Acessa os inimigos 1 por 1 
+
         assets['som da explosão do inimigo'].play()#roda o som de explosão do inimigo 
         novo_inimigo = Inimigo(assets , groups)#cria inimigo novamente 
         all_sprites.add(novo_inimigo)#Adiciona sprite do inimigo no grupo de todos os sprites 
@@ -509,13 +591,20 @@ while game:
         morte_inimigo = explod_inimigo(navio.rect.center, assets)#roda animação de explosão do inimigo
         all_sprites.add(morte_inimigo)#Adiciona animação de explosão do inimigo no grupo de todos os sprites 
         placar += 100#adiciona os pontos do jogador 
+
         if placar % 500 == 0 and placar > 0:#verifica se o jogador ganhou 500 pontos
+            
             if placar / 500 not in vidas_ganhas:#verifica se é a primeira vez que o jogador chegou nessa quantidade de pontos 
+                
                 vidas += 1#adiciona vidas ao jogador 
                 vidas_ganhas.append(placar / 500)#acrescenta à lista de vidas ganhas essa quantidade de pontos 
+    
     if pygame.sprite.spritecollide(navio_amigo, groups['todos_tiros_inimigo'], True, pygame.sprite.collide_mask):#Verifica colisão do jogdor com os tiros inimigos
         vidas -= 1#Reduz a quantidade de vidas 
-        placar -= 500#Reduz a quantidade de pontos 
+        placar -= 500#Reduz a quantidade de pontos
+        navio_amigo.dano()
+    
+
 
     if vidas == 0:#verifica se ainda tem vidas 
         morte_jogador = explo_jogador(navio_amigo.rect.center, assets)#roda animação de explosão do navio do jogador 
