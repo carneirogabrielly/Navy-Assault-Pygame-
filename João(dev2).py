@@ -85,18 +85,33 @@ for i in range(23):
 
 assets['anim_explod_inimigo'] = anim_explod_inimigo
 
+anim_tiro_inimigo2= []
+
+for i in range(3):
+    arquivo4 = f'Imagens/Barco_inimigo/tiro_inimigo/{i}.png'
+
+    imagem = pygame.image.load(arquivo4).convert_alpha()
+    imagem = pygame.transform.scale(imagem, (80,100))
+    anim_tiro_inimigo2.append(imagem)
+
+assets['anim_tiro_inimigo'] = anim_tiro_inimigo2
+
 
 #Sons 
 
 
 pygame.mixer.music.load('Sons/Música_fundo.mp3')
 pygame.mixer.music.set_volume(0.05)
+
 assets['som do tiro do jogador'] = pygame.mixer.Sound('Sons/tiro_jogador.ogg')
 assets['som do tiro do jogador'].set_volume(0.01)
+
 assets['som do tiro do inimigo'] = pygame.mixer.Sound('Sons/tiro_oponente.wav')
 assets['som do tiro do inimigo'].set_volume(0.01)
+
 assets['som da explosão do jogador'] = pygame.mixer.Sound('Sons/explosão_barco.wav')
 assets['som da explosão do jogador'].set_volume(0.05)
+
 assets['som da explosão do inimigo'] = pygame.mixer.Sound('Sons/Inimigo_explodindo.ogg')
 assets['som da explosão do inimigo'].set_volume(0.05)
 
@@ -114,6 +129,7 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         self.all_sprites = all_sprites
         self.todos_tiros_inimigo = todos_tiros_inimigo
         self.imagem_tiro_inimigo = assets['imagem_tiro_inimigo']
+
     def update(self):
         #Atualizando a posição do navio 
         self.rect.x += self.vx_oponente 
@@ -129,6 +145,7 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         if self.rect.y > comprimento:
             self.rect.y = 1
             self.rect.x = random.randint(0 , 560)
+
     def tiro_inimigo(self):
         novo_tiro_inimigo = Tiro_inimigo(assets['imagem_tiro_inimigo'] , self.rect.bottom  , self.rect.centerx)
         self.all_sprites.add(novo_tiro_inimigo)
@@ -218,6 +235,7 @@ class Tiro_inimigo(pygame.sprite.Sprite):
 
 
 class canhao_anim(pygame.sprite.Sprite):
+
     def __init__(self, centrox, velocidadex, assets):
         pygame.sprite.Sprite.__init__(self)
 
@@ -227,7 +245,7 @@ class canhao_anim(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.centerx =  centrox 
-        self.rect.centery = comprimento - 10  #Captura a posição do cnetro do retangulo da imagem no eixo 'y'
+        self.rect.centery = comprimento - 10  #Captura a posição do centro do retangulo da imagem no eixo 'y'
         self.speedx = velocidadex #Define a velocidade da animação(para acompanhar o barco após o tiro)
         self.ultima_vez = pygame.time.get_ticks()#Captura o tempo da animação
 
@@ -264,12 +282,13 @@ class canhao_anim(pygame.sprite.Sprite):
                 self.rect.x = -29#Reposiciona a animação
                 
 
-class explo_jogador(pygame.sprite.Sprite):#Represent a explosão do jogador 
+class explo_jogador(pygame.sprite.Sprite):#Represent a explosão do jogador
+    
    def __init__(self, centro, assets): #construtor da classe 
         pygame.sprite.Sprite.__init__(self)# Construtor da classe mãe 
 
-        self.explosao = assets['anim_explosion_barco_amigo']#atributo que armazena as imagens da animação
-        self.frame = 0#numeração da imagem da animação
+        self.explosao = assets['anim_explosion_barco_amigo']#Atributo que armazena as imagens da animação
+        self.frame = 0#Numeração da imagem da animação
         self.image = self.explosao[self.frame]#Define a imagem atual da animação
         self.rect = self.image.get_rect()#Captura a área retangular da imagem
         self.rect.center = centro #Define a posição em 'x' e 'y' do centro da imagem
@@ -302,7 +321,9 @@ class explo_jogador(pygame.sprite.Sprite):#Represent a explosão do jogador
             self.rect.center =  centro#Define a posição em 'x' e 'y' do centro da imagem
 
 class explod_inimigo(pygame.sprite.Sprite):#Representa a animação de explosão do inimigo
+   
    def __init__(self, centro, assets):#Construtor da classe
+        
         pygame.sprite.Sprite.__init__(self)#Construtor da classe mãe 
 
         self.explosao = assets['anim_explod_inimigo']#atributo que armazena as imagens da animação
@@ -338,6 +359,57 @@ class explod_inimigo(pygame.sprite.Sprite):#Representa a animação de explosão
             self.rect = self.image.get_rect()#Captura o espaço retangular da imagem
             self.rect.center =  centro#Define a posição em 'x' e 'y' do centro da imagem
 
+
+
+class canhao_inimigo_anim(pygame.sprite.Sprite):
+    
+    def __init__(self, centerx, centery, velocidadex, velocidadey, assets):    
+        pygame.sprite.Sprite.__init__(self)
+
+        self.tiro = assets['anim_tiro_inimigo']
+        self.frame = 0
+        self.image = self.tiro[self.frame]
+        self.rect = self.image.get_rect()
+        self.rect.centerx = centerx
+        self.rect.centery = centery
+        self.ultima_vez = pygame.time.get_ticks()
+        self.speedx = velocidadex
+        self.speedy = velocidadey
+
+        self.temporizador = 2
+
+    def update(self):
+        agora = pygame.time.get_ticks()#Captura o tempo atual 
+
+
+        tempo_decorrido = agora - self.temporizador#Verifica o tempo decorrido
+
+        if tempo_decorrido > self.temporizador:#condição para que a animação continue a rodar 
+
+            self.ultima_vez = agora#Captura o tempo da ultima animação
+
+
+            self.frame += 1 #atualiza a que será usada
+
+        if self.frame == len(self.tiro):#verifica se chegou à ultima imagem
+            self.kill()#finaliza a animação
+
+        else:
+
+            centrox = self.rect.centerx + self.speedx#Atualiza a posição da animação 
+            centroy = self.rect.centery + self.speedy
+            self.image = self.tiro[self.frame]#Define nova imagem
+            self.rect = self.image.get_rect()#Captura o espaço retangular da imagem
+            self.rect.centerx =  centrox#Define a posição em 'x' e 'y' do centro da imagem
+            self.rect.centery = centroy
+
+            if self.rect.x > 595:#Verifica se a animação passou do limite positivo da tela
+                self.rect.x = 595#Reposiciona a animação
+            if self.rect.x < -30:#Verifica se a animação passou do limite negativo da tela 
+                self.rect.x = -29#Reposiciona a animação
+            
+
+
             
 
 
@@ -352,11 +424,17 @@ placar = 0
 #criando navios: 
 
 all_sprites = pygame.sprite.Group() #Uma lista que armazena todos os sprites do jogo 
+
 todos_tiros = pygame.sprite.Group() #Lista que armazena somente os tiros do jogador 
+
 todos_tiros_inimigo = pygame.sprite.Group()#lista que armazena todos os tiros dos inimigos 
+
 n_inimigos = 4 #variável que armazena a quantidade de inimigos 
+
 todos_inimigos = pygame.sprite.Group()#lista que armazena todos os inimigos
+
 for i in range(n_inimigos):#loop para armazenar todos os inimigos dentro do grupo
+
     navio = Inimigo(assets , all_sprites , todos_tiros_inimigo)#Gerador do barco inimigo 
     all_sprites.add(navio)#adiciona o navio à lista de sprites 
     todos_inimigos.add(navio)#adiciona o navio a lista de inimigos 
@@ -367,6 +445,7 @@ all_sprites.add(navio_amigo)#adiciona o navio à lista de sprites
 
 #Relógio que controla o loop
 clock = pygame.time.Clock()
+
 FPS = 50#quantidade de imagens que são mostradas na tela por segundo 
 tempo_inimigo = 0 #tempo em que o inimigo ira atirar 
 #----Loop principal do jogo ---
@@ -377,6 +456,8 @@ while game:
         for i in todos_inimigos: #loop para acessar todos os inimigos dentro da lista
             i.tiro_inimigo()#faz o inimigo atirar 
             assets['som do tiro do inimigo'].play()#roda o som do tiro 
+            anim_tiro2 = canhao_inimigo_anim(i.rect.centerx, i.rect.centery, i.vx_oponente,i.vy_oponente,  assets)
+            all_sprites.add(anim_tiro2)
         tempo_inimigo = 0 #reinicia o contador de tempo após atirar 
     # ----- Trata eventos
     for event in pygame.event.get(): #pygame.evente.get devolve uma lista com todos os eventos que ocorreram desde a última janela 
