@@ -54,6 +54,7 @@ assets['Imagem_vida'] = pygame.transform.scale(assets['imagem_jogador'], (largur
 
 assets['fonte_placar'] = pygame.font.SysFont('cooper black' , 28 , True , False)
 
+
 anim_tiro_jogador = []
 
 for i in range(3):
@@ -101,21 +102,22 @@ assets['anim_tiro_inimigo'] = anim_tiro_inimigo2
 
 
 pygame.mixer.music.load('Sons/Música_fundo.mp3')
-pygame.mixer.music.set_volume(0.05)
+pygame.mixer.music.set_volume(0.4)
 
 assets['som do tiro do jogador'] = pygame.mixer.Sound('Sons/tiro_jogador.ogg')
-assets['som do tiro do jogador'].set_volume(0.01)
+assets['som do tiro do jogador'].set_volume(0.2)
 
 assets['som do tiro do inimigo'] = pygame.mixer.Sound('Sons/tiro_oponente.wav')
-assets['som do tiro do inimigo'].set_volume(0.01)
+assets['som do tiro do inimigo'].set_volume(0.2)
 
 assets['som da explosão do jogador'] = pygame.mixer.Sound('Sons/explosão_barco.wav')
-assets['som da explosão do jogador'].set_volume(0.05)
+assets['som da explosão do jogador'].set_volume(0.2)
 
 assets['som da explosão do inimigo'] = pygame.mixer.Sound('Sons/Inimigo_explodindo.ogg')
-assets['som da explosão do inimigo'].set_volume(0.05)
+assets['som da explosão do inimigo'].set_volume(0.2)
 
-
+assets['som do jogador travado'] = pygame.mixer.Sound('Sons/navio_n_atira.wav')
+assets['som do jogador travado'].set_volume(0.4)
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , assets , groups): #Essa classe baseia-se na entrada de uma imagem 
@@ -462,6 +464,7 @@ regenerando = 2
 playing = 3 
 state = playing
 #----Loop principal do jogo ---
+pygame.mixer.music.play(loops=-1)
 while state != acabou: 
     clock.tick(FPS) 
     tempo_inimigo += 1 #adiciona tempo ao ocntador 
@@ -486,11 +489,13 @@ while state != acabou:
             if event.key == pygame.K_RIGHT:#verifica a tecla apertada 
                 navio_amigo.vx_jogador += 8#faz o jogador se movimentar para a direita 
             if event.key == pygame.K_SPACE:#verifica a tecla apertada 
-                navio_amigo.tiro()#Faz o navio do jogador atirar 
-                assets['som do tiro do jogador'].play()#roda o som do tiro do jogador 
-                tiro = canhao_anim(navio_amigo.rect.centerx,navio_amigo.vx_jogador, assets)#realiza a animação de tiro do jogador 
-                all_sprites.add(tiro)#Adiciona a animação no grupo de sprites 
-
+                if state == playing:
+                    navio_amigo.tiro()#Faz o navio do jogador atirar 
+                    assets['som do tiro do jogador'].play()#roda o som do tiro do jogador 
+                    tiro = canhao_anim(navio_amigo.rect.centerx,navio_amigo.vx_jogador, assets)#realiza a animação de tiro do jogador 
+                    all_sprites.add(tiro)#Adiciona a animação no grupo de sprites 
+                if state == regenerando:
+                    assets['som do jogador travado'].play()   
         # Verifica se soltou alguma tecla.
         if event.type == pygame.KEYUP:
             # Dependendo da tecla, altera a velocidade.
