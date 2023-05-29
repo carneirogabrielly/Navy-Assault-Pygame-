@@ -1,3 +1,4 @@
+from typing import Any
 import pygame 
 import random 
 import time
@@ -252,9 +253,60 @@ class Tiro_inimigo(pygame.sprite.Sprite):
             self.kill()
 
 
+class Boss(pygame.sprite.Sprite):
+    def __init__(self , assets , groups):
+        pygame.sprite.Sprite.__init__(self)
+        self.image= assets['imagem_boss'] 
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = largura/2
+        self.rect.bottom = 30
+        self.vx_boss = 2
+        self.vy_boss = 1
+        self.todos_tiros_boss = groups['todos_tiro_boss']
+        self.all_sprites = groups['all_sprites']
+        self.imagem_tiro_boss = assets['imagem_bala_boss']
+    def update(self):
+        self.rect.x += self.vx_boss
+        self.rect.y = self.vy_boss
+        
+        #Condições para reposcionar o inimigo: 
+        if self.rect.x > 595:
+            self.rect.x = 595
+            self.vx_oponente = self.vx_oponente * -1
+        if self.rect.x <  -30:
+            self.rect.x = -30 
+            self.vx_oponente = self.vx_oponente * -1 
+        if self.rect.y > comprimento:
+            self.rect.y = 10
+            self.rect.x = random.randint(0 , 560)
+    def tiro_boss(self):
+        novo_tiro_boss1 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 0 , 15 )
+        novo_tiro_boss2 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 0.3 , 15 )
+        novo_tiro_boss3 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , -0.3 , 15 )
+        self.todos_tiros_boss.add(novo_tiro_boss1)
+        self.todos_tiros_boss.add(novo_tiro_boss2)
+        self.todos_tiros_boss.add(novo_tiro_boss3)
+        self.all_sprites.add(novo_tiro_boss1)
+        self.all_sprites.add(novo_tiro_boss2)
+        self.all_sprites.add(novo_tiro_boss3)
+class Tiro_boss(pygame.sprite.Sprite):
+    def __init__(self, img , bottom , centerx , vx_tiro_boss , vy_tiro_boss):
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect.centerx = centerx
+        self.rect.bottom = bottom + 20
+        self.vy_tiro_boss = vy_tiro_boss
+        self.vx_tiro_boss = vx_tiro_boss
+    def update(self):
+        self.rect.x += self.vx_tiro_boss
+        self.rect.y += self.vy_tiro_boss
 
-
-
+        if self.rect.left > largura or self.rect.right < 0:
+            self.kill()
+        if self.rect.bottom > comprimento:
+            self.kill()
 
 class canhao_anim(pygame.sprite.Sprite):
 
