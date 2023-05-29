@@ -46,7 +46,7 @@ assets = {}
 assets['imagem_fundo'] = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
 assets['imagem_fundo'] = pygame.transform.scale(assets['imagem_fundo'] , (650,800)) #Converte a imagem para a escala 
 
-assets['imagem_inicio'] = pygame.image.load('Imagens/Fundo.png').convert()
+assets['imagem_inicio'] = pygame.image.load('Imagens/tela .png').convert()
 
 assets['imagem_oponente'] = pygame.image.load('Imagens/Barco_inimigo/Barco_inimigo.png').convert_alpha()
 assets['imagem_oponente'] = pygame.transform.scale(assets['imagem_oponente'] , (largura_oponente,comprimento_oponente))
