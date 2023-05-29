@@ -1,6 +1,7 @@
 import pygame 
 import random 
 import time
+import math
 
 pygame.init() #Inicializa o framework do pygame 
 pygame.mixer.init()
@@ -54,6 +55,11 @@ assets['Imagem_vida'] = pygame.transform.scale(assets['imagem_jogador'], (largur
 
 assets['fonte_placar'] = pygame.font.SysFont('cooper black' , 28 , True , False)
 
+
+#Definindo variaveis do scroll
+imagem_fundo_bg = assets['imagem_fundo'].get_width()
+scroll = 0
+tiles = math.ceil(comprimento / imagem_fundo_bg) + 1
 
 anim_tiro_jogador = []
 
@@ -562,7 +568,19 @@ while state != acabou:
      
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
-    window.blit(assets['imagem_fundo'] , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
+    window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
+    for i in range(0, tiles):
+            window.blit(assets['imagem_fundo'], (0, i * imagem_fundo_bg + scroll))
+    
+    #Colocando o scrool no fundo
+    scroll -= 5
+    
+    #Resetando o scroll
+    if abs(scroll) > imagem_fundo_bg:
+        scroll = 0
+        
+    window.blit(assets['imagem_placar'] , (550 , 5))#desenha a imagem do placar na janela do jogo 
+    all_sprites.draw(window)#Desenha as imagens de todos os sprites na janela do jogo 
     window.blit(assets['imagem_placar'] , (550 , 5))#desenha a imagem do placar na janela do jogo 
     all_sprites.draw(window)#Desenha as imagens de todos os sprites na janela do jogo 
 
