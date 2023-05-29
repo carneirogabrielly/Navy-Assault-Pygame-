@@ -29,7 +29,9 @@ comrpimento_tiro = 35
 largura_vida = 50
 comprimento_vida = 50
 
-
+#Tamanho do Boss
+largura_boss = 250
+comprimento_boss = 300
 #Imagens
 assets = {}
 assets['imagem_fundo'] = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
@@ -54,6 +56,8 @@ assets['Imagem_vida'] = pygame.transform.scale(assets['imagem_jogador'], (largur
 
 assets['fonte_placar'] = pygame.font.SysFont('cooper black' , 28 , True , False)
 
+assets['imagem_boss']  = pygame.image.load('Imagens/Boss.png')
+assets['imagem_boss'] = pygame.transform.scale(assets['imagem_boss'] , (largura_boss , comprimento_boss))
 
 anim_tiro_jogador = []
 
@@ -563,7 +567,7 @@ while state != acabou:
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
     window.blit(assets['imagem_fundo'] , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
-    window.blit(assets['imagem_placar'] , (550 , 5))#desenha a imagem do placar na janela do jogo 
+    window.blit(assets['imagem_placar'] , (550 , 5))  #desenha a imagem do placar na janela do jogo 
     all_sprites.draw(window)#Desenha as imagens de todos os sprites na janela do jogo 
 
     #Colocando placar
