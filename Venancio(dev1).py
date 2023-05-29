@@ -2,6 +2,8 @@ import pygame
 import random 
 import time
 
+
+
 pygame.init() #Inicializa o framework do pygame 
 pygame.mixer.init()
 #---Gera tela principal 
@@ -32,6 +34,12 @@ comprimento_vida = 50
 #Tamanho do Boss
 largura_boss = 250
 comprimento_boss = 300
+
+#Bala do Boss 
+largura_bala_boss = 55
+comprimento_bala_boss = 55 
+
+
 #Imagens
 assets = {}
 assets['imagem_fundo'] = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
@@ -56,8 +64,12 @@ assets['Imagem_vida'] = pygame.transform.scale(assets['imagem_jogador'], (largur
 
 assets['fonte_placar'] = pygame.font.SysFont('cooper black' , 28 , True , False)
 
-assets['imagem_boss']  = pygame.image.load('Imagens/Boss.png')
+assets['imagem_boss']  = pygame.image.load('Imagens/Boss/Boss.png')
 assets['imagem_boss'] = pygame.transform.scale(assets['imagem_boss'] , (largura_boss , comprimento_boss))
+
+assets['imagem_bala_boss'] = pygame.image.load('Imagens/Boss/Bala_de_canhão_boss.png')
+assets['imagem_bala_boss']  = pygame.transform.scale(assets['imagem_bala_boss'] , (largura_bala_boss , comprimento_bala_boss))
+
 
 anim_tiro_jogador = []
 
@@ -238,6 +250,10 @@ class Tiro_inimigo(pygame.sprite.Sprite):
         # Se o tiro passar do inicio da tela, morre.
         if self.rect.bottom < 0:
             self.kill()
+
+
+
+
 
 
 class canhao_anim(pygame.sprite.Sprite):
@@ -573,7 +589,6 @@ while state != acabou:
     #Colocando placar
     superficie_placar = assets['fonte_placar'].render("{0}".format(placar) , True , (255 , 255 , 255))#guarda a imagem da quantidade de pontos que será mostrada 
     window.blit(superficie_placar , (560 , 40))#desenha a quantidade de pontos na janela 
-
     #Colocando vidas
     x_vida = 25#posição inicial da imagem de vidas no eixo 'x' 
     y_vida = 10#posição inicial da imagem de vidas no eixo 'y'
