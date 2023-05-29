@@ -118,7 +118,7 @@ assets['som da explosão do inimigo'].set_volume(0.05)
 
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
-    def __init__(self , assets , all_sprites , todos_tiros_inimigo): #Essa classe baseia-se na entrada de uma imagem 
+    def __init__(self , assets , groups): #Essa classe baseia-se na entrada de uma imagem 
         pygame.sprite.Sprite.__init__(self) 
         self.image = assets['imagem_oponente']
         self.rect = self.image.get_rect()
@@ -126,8 +126,8 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
         self.rect.y = 1
         self.vx_oponente = random.randint(-2 , 2 )
         self.vy_oponente = 3.5
-        self.all_sprites = all_sprites
-        self.todos_tiros_inimigo = todos_tiros_inimigo
+        self.all_sprites = groups['all_sprites']
+        self.todos_tiros_inimigo = groups['todos_tiros_inimigo']
         self.imagem_tiro_inimigo = assets['imagem_tiro_inimigo']
 
     def update(self):
@@ -154,7 +154,7 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
 
 #criando classe pro jogador
 class jogador(pygame.sprite.Sprite):
-    def __init__(self, assets, all_sprites, todos_tiros, ):
+    def __init__(self, assets, groups):
         pygame.sprite.Sprite.__init__(self) 
         self.image = assets['imagem_jogador']
         self.mask = pygame.mask.from_surface(self.image)
@@ -162,8 +162,8 @@ class jogador(pygame.sprite.Sprite):
         self.rect.centerx = largura/2
         self.rect.bottom = comprimento - 10
         self.vx_jogador = 0
-        self.all_sprites = all_sprites
-        self.todos_tiros = todos_tiros
+        self.all_sprites = groups['all_sprites']
+        self.todos_tiros = groups['todos_tiros']
         self.imagem_tiro = assets['imagem_tiro']
     
     def update(self):
@@ -433,13 +433,19 @@ n_inimigos = 4 #variável que armazena a quantidade de inimigos
 
 todos_inimigos = pygame.sprite.Group()#lista que armazena todos os inimigos
 
+groups = {}
+groups['all_sprites'] = all_sprites
+groups['todos_tiros'] = todos_tiros
+groups['todos_tiros_inimigo'] = todos_tiros_inimigo
+groups['todos_inimigos'] = todos_inimigos
+
 for i in range(n_inimigos):#loop para armazenar todos os inimigos dentro do grupo
 
-    navio = Inimigo(assets , all_sprites , todos_tiros_inimigo)#Gerador do barco inimigo 
+    navio = Inimigo(assets , groups)#Gerador do barco inimigo 
     all_sprites.add(navio)#adiciona o navio à lista de sprites 
     todos_inimigos.add(navio)#adiciona o navio a lista de inimigos 
 
-navio_amigo = jogador(assets , all_sprites, todos_tiros)#gerador do navio do jogador 
+navio_amigo = jogador(assets, groups)#gerador do navio do jogador 
 all_sprites.add(navio_amigo)#adiciona o navio à lista de sprites 
 
 
@@ -488,16 +494,16 @@ while game:
     all_sprites.update()#atualiza todos os eventos dos sprites dentro dos grupos 
 
     if pygame.sprite.spritecollide(navio_amigo, todos_inimigos, True, pygame.sprite.collide_mask):#verifica se houve colizão entre o jogador e algum inimigo
-        novo_inimigo = Inimigo(assets , all_sprites , todos_tiros_inimigo)#cria inimigo novamente 
+        novo_inimigo = Inimigo(assets , groups)#cria inimigo novamente 
         all_sprites.add(novo_inimigo)#Adiciona sprite do inimigo no grupo de todos os sprites 
         todos_inimigos.add(novo_inimigo)#Adiciona sprite do inimigo no grupo de sprites dos inimigos 
         vidas -= 1#Diminui a quantidade de vida do jogador 
         placar -= 1000#Reduz a pontuação do jogador 
         assets['som da explosão do inimigo'].play()#Roda o som da explosão do inimigo
-    hit_navio = pygame.sprite.groupcollide(todos_inimigos, todos_tiros, True, True, pygame.sprite.collide_mask)#Armazena todos os inimigos que foram acertados por tiros 
+    hit_navio = pygame.sprite.groupcollide(groups['todos_inimigos'], groups['todos_tiros'], True, True, pygame.sprite.collide_mask)#Armazena todos os inimigos que foram acertados por tiros 
     for navio in hit_navio:#Acessa os inimigos 1 por 1 
         assets['som da explosão do inimigo'].play()#roda o som de explosão do inimigo 
-        novo_inimigo = Inimigo(assets , all_sprites , todos_tiros_inimigo)#cria inimigo novamente 
+        novo_inimigo = Inimigo(assets , groups)#cria inimigo novamente 
         all_sprites.add(novo_inimigo)#Adiciona sprite do inimigo no grupo de todos os sprites 
         todos_inimigos.add(novo_inimigo)#Adiciona sprite do inimigo no grupo de sprites dos inimigos 
         morte_inimigo = explod_inimigo(navio.rect.center, assets)#roda animação de explosão do inimigo
@@ -507,7 +513,7 @@ while game:
             if placar / 500 not in vidas_ganhas:#verifica se é a primeira vez que o jogador chegou nessa quantidade de pontos 
                 vidas += 1#adiciona vidas ao jogador 
                 vidas_ganhas.append(placar / 500)#acrescenta à lista de vidas ganhas essa quantidade de pontos 
-    if pygame.sprite.spritecollide(navio_amigo, todos_tiros_inimigo, True, pygame.sprite.collide_mask):#Verifica colisão do jogdor com os tiros inimigos
+    if pygame.sprite.spritecollide(navio_amigo, groups['todos_tiros_inimigo'], True, pygame.sprite.collide_mask):#Verifica colisão do jogdor com os tiros inimigos
         vidas -= 1#Reduz a quantidade de vidas 
         placar -= 500#Reduz a quantidade de pontos 
 
