@@ -143,8 +143,7 @@ assets['som do jogador travado'].set_volume(0.4)
 assets['jogador colidindo'] = pygame.mixer.Sound('Sons/contato_com_navio.wav')
 assets['jogador colidindo'].set_volume(0.3)
 
-assets['jogador curando'] = pygame.mixer.Sound('Sons/barco_curando.wav')
-assets['jogador curando'].set_volume(0.6)
+
 
 assets['boss_chegando'] = pygame.mixer.Sound('Sons/som_boss_chegando.flac')
 assets['boss_chegando'].set_volume(0.9)
@@ -655,7 +654,6 @@ while state != acabou:
                 morreu = pygame.time.get_ticks()
     elif state == regenerando:
             now = pygame.time.get_ticks()
-            assets['jogador curando'].play()
             if now - tomou_tiro > 3000:
                 state = playing
                 now = 0 
