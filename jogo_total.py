@@ -1,7 +1,6 @@
 
 import pygame 
 import random 
-import time
 import math
 
 
@@ -644,7 +643,7 @@ fase_final = 20
 status_fase = fase_1
 #----Loop principal do jogo ---
 pygame.mixer.music.play(loops=-1)
-while state != game_over and state != venceu: 
+while state != game_over and state != venceu and state != acabou: 
     clock.tick(FPS) 
     while state == tela_inicio:
         window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
