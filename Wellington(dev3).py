@@ -36,9 +36,13 @@ comprimento_vida = 50
 assets = {}
 assets['imagem_fundo'] = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
 assets['imagem_fundo'] = pygame.transform.scale(assets['imagem_fundo'] , (650,800)) #Converte a imagem para a escala 
+imagem_fundo_rect = assets['imagem_fundo'].get_rect()
 
 assets['imagem_inicial'] = pygame.image.load('Imagens/tela_inicio.png').convert()
 assets['imagem_inicial'] = pygame.transform.scale(assets['imagem_inicial'] , (650,800))
+
+assets['game_over'] = pygame.image.load('Imagens/tela_game_over.png').convert()
+assets['game_over'] = pygame.transform.scale(assets['game_over'], (650,800))
 
 assets['imagem_oponente'] = pygame.image.load('Imagens/Barco_inimigo/Barco_inimigo.png').convert_alpha()
 assets['imagem_oponente'] = pygame.transform.scale(assets['imagem_oponente'] , (largura_oponente,comprimento_oponente))
@@ -419,10 +423,7 @@ class canhao_inimigo_anim(pygame.sprite.Sprite):
                 self.rect.x = 595#Reposiciona a animação
             if self.rect.x < -30:#Verifica se a animação passou do limite negativo da tela 
                 self.rect.x = -29#Reposiciona a animação
-            
-
-
-            
+        
 
 
 #----Inicializa estrutura de dados 
@@ -468,28 +469,30 @@ FPS = 50  #quantidade de imagens que são mostradas na tela por segundo
 tempo_inimigo = 0 #tempo em que o inimigo ira atirar 
 
 #Iniciando a utilização de estados: 
-acabou = 0 
-perdeu_vidas = 1
-regenerando = 2 
-playing = 3 
-state = playing
-tela_inicio = True
-jogo_iniciado = False
-
-while tela_inicio:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.KEYDOWN:
-            jogo_iniciado = True
-            tela_inicio = False
-            window.blit(assets['imagem_inicial'], (650,800))
+acabou = 5
+perdeu_vidas = 3
+regenerando = 4
+playing = 2
+tela_inicio = 0
+game_over = 6
+state = tela_inicio
 
 #----Loop principal do jogo ---
 pygame.mixer.music.play(loops=-1)
-while state != acabou: 
+while state != game_over: 
     clock.tick(FPS) 
+    while state == tela_inicio:
+        window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
+        window.fill( (0 , 0 , 0))
+        window.blit(assets['imagem_inicial'], imagem_fundo_rect)
+        
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    state = playing
+
     tempo_inimigo += 1 #adiciona tempo ao ocntador 
     if tempo_inimigo == 50:#verifica se já passou  o tempo necessário para o inimigo atirar 
         for i in todos_inimigos: #loop para acessar todos os inimigos dentro da lista
@@ -504,7 +507,6 @@ while state != acabou:
         # ----- Verifica consequências
         if event.type == pygame.QUIT: #Se o comando do evento for igual a pygame.quit, o loop acaba 
             state = acabou #finaliza o jogo 
-       
         # Verifica se apertou alguma tecla.
         if event.type == pygame.KEYDOWN:
             # Dependendo da tecla, altera a velocidade.
@@ -570,7 +572,7 @@ while state != acabou:
                 morreu = pygame.time.get_ticks()
     elif state == regenerando:
             now = pygame.time.get_ticks()
-            if now - tomou_tiro > 3000:
+            if now - tomou_tiro > 0:
                 state = playing
                 now = 0 
     
@@ -582,8 +584,9 @@ while state != acabou:
         assets['som da explosão do jogador'].play()#Roda o som de explosão do navio do jogador
         tempo_morte =  pygame.time.get_ticks()
         if tempo_morte - morreu > 3000:
-            state = acabou
-     
+            state = game_over
+
+                    
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
@@ -612,9 +615,23 @@ while state != acabou:
     for i in range(vidas):#loop para gerar imagens das vidas 
         window.blit(assets['Imagem_vida'], (x_vida, y_vida))#desenha a imagem da vida na tela 
         x_vida += 25#move a posição da imagem no eixo 'x'
+
+    print(state)
     
     
     #Autaliza estado do jogo 
     pygame.display.update() #Atualiza o estado do jogo observado a cada loop
 #--- Finalização 
-pygame.quit() #Finaliza o game     
+while state == game_over:
+    clock.tick(FPS)
+    window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
+    window.fill( (0 , 0 , 0))
+    window.blit(assets['game_over'], imagem_fundo_rect)
+
+    pygame.display.update()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            state = acabou
+
+    
+pygame.QUIT
