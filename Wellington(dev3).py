@@ -2,15 +2,7 @@ import pygame
 import random 
 import time
 import math
-from init_screen import init_screen
-from game_screen import game_screen
-
-
-# Estados para controle do fluxo da aplicação
-INIT = 0
-GAME = 1
-QUIT = 2
-
+import sys
 
 pygame.init() #Inicializa o framework do pygame 
 pygame.mixer.init()
@@ -20,7 +12,6 @@ comprimento = 800 #Comprimento da tela
 
 window = pygame.display.set_mode((largura , comprimento)) #Inicializa o display da janela, com as suas dimensões 
 pygame.display.set_caption('Navy Assault') #Coloca o título da janela 
-
 
 
 # ---- Inicia assets (Imagem) 
@@ -46,7 +37,8 @@ assets = {}
 assets['imagem_fundo'] = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
 assets['imagem_fundo'] = pygame.transform.scale(assets['imagem_fundo'] , (650,800)) #Converte a imagem para a escala 
 
-assets['imagem_inicio'] = pygame.image.load('Imagens/tela .png').convert()
+assets['imagem_inicial'] = pygame.image.load('Imagens/tela_inicio.png').convert()
+assets['imagem_inicial'] = pygame.transform.scale(assets['imagem_inicial'] , (650,800))
 
 assets['imagem_oponente'] = pygame.image.load('Imagens/Barco_inimigo/Barco_inimigo.png').convert_alpha()
 assets['imagem_oponente'] = pygame.transform.scale(assets['imagem_oponente'] , (largura_oponente,comprimento_oponente))
@@ -481,15 +473,19 @@ perdeu_vidas = 1
 regenerando = 2 
 playing = 3 
 state = playing
+tela_inicio = True
+jogo_iniciado = False
 
-state = INIT
-while state != QUIT:
-    if state == INIT:
-        state = init_screen(window)
-    elif state == GAME:
-        state = game_screen(window)
-    else:
-        state = QUIT
+while tela_inicio:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            jogo_iniciado = True
+            tela_inicio = False
+            window.blit(assets['imagem_inicial'], (650,800))
+
 #----Loop principal do jogo ---
 pygame.mixer.music.play(loops=-1)
 while state != acabou: 
@@ -508,6 +504,7 @@ while state != acabou:
         # ----- Verifica consequências
         if event.type == pygame.QUIT: #Se o comando do evento for igual a pygame.quit, o loop acaba 
             state = acabou #finaliza o jogo 
+       
         # Verifica se apertou alguma tecla.
         if event.type == pygame.KEYDOWN:
             # Dependendo da tecla, altera a velocidade.
@@ -615,7 +612,8 @@ while state != acabou:
     for i in range(vidas):#loop para gerar imagens das vidas 
         window.blit(assets['Imagem_vida'], (x_vida, y_vida))#desenha a imagem da vida na tela 
         x_vida += 25#move a posição da imagem no eixo 'x'
-      
+    
+    
     #Autaliza estado do jogo 
     pygame.display.update() #Atualiza o estado do jogo observado a cada loop
 #--- Finalização 
