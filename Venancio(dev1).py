@@ -513,7 +513,7 @@ class canhao_inimigo_anim(pygame.sprite.Sprite):
 
 #quantidade de vidas do jogador
 vidas = 3
-vidas_boss = 50
+vidas_boss = 75
 vidas_ganhas = []#Armazena quais pontuações já cederam vida ao jogador 
 #placar
 placar = 0 
@@ -665,7 +665,7 @@ while state != acabou:
             state = acabou
     
     
-    if tempo_fase1 - (1000 * 1) > 0 and status_fase == fase_1:
+    if tempo_fase1 - (1000 * 90) > 0 and status_fase == fase_1:
         status_fase = fase_final
         assets['boss_chegando'].play()
         for tiro_inimigo2 in todos_tiros_inimigo:
