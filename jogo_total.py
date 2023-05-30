@@ -73,7 +73,7 @@ assets['imagem_placar'] = pygame.transform.scale(assets['imagem_placar'] , (100,
 
 assets['Imagem_vida'] = pygame.transform.scale(assets['imagem_jogador'], (largura_vida, comprimento_vida))
 
-assets['fonte_placar'] = pygame.font.SysFont('cooper black' , 28 , True , False)
+
 
 assets['imagem_boss']  = pygame.image.load('Imagens/Boss/Boss.png')
 assets['imagem_boss'] = pygame.transform.scale(assets['imagem_boss'] , (largura_boss , comprimento_boss))
@@ -127,6 +127,21 @@ for i in range(3):
     anim_tiro_inimigo2.append(imagem)
 
 assets['anim_tiro_inimigo'] = anim_tiro_inimigo2
+
+assets['vida_boss'] = pygame.transform.scale(assets['imagem_boss'] , (50 , 50))
+
+anim_explod_boss = []
+for i in range(49):
+    arquivo5 = f'Imagens/Boss/explosão_boss/{i}.png'
+    imagem = pygame.image.load(arquivo5).convert_alpha()
+    imagem = pygame.transform.scale(imagem,(largura_boss,comprimento_boss))
+    anim_explod_boss.append(imagem)
+
+assets['anim_explod_boss'] = anim_explod_boss
+
+#fonte
+assets['fonte_regen'] = pygame.font.SysFont('arial' , 28 , True , False)
+assets['fonte_placar'] = pygame.font.SysFont('cooper black' , 28 , True , False)
 
 
 #Sons 
@@ -297,7 +312,7 @@ class Boss(pygame.sprite.Sprite):
         self.imagem_tiro_boss = assets['imagem_bala_boss']
 
         self.tempo = pygame.time.get_ticks()
-
+        self.subiu = False
         
     def update(self):
         self.rect.x += self.vx_boss
@@ -313,16 +328,23 @@ class Boss(pygame.sprite.Sprite):
         if self.rect.top > 700:
             self.rect.y = 1
             self.rect.x = random.randint(0 , 300)
-        if self.rect.bottom == comprimento + 10:
-            self.vy_boss = - 10
+        if self.rect.bottom >= comprimento + 20:
+            self.vy_boss = - 20
             self.vx_boss = 0
         if self.rect.top == -40:
             self.vx_boss = 2
             self.vy_boss = 1
+            self.subiu = True
+        
+        if self.rect.bottom == comprimento/2 + 50 and self.subiu == True:
+            self.vy_boss = 10
+            self.vx_boss = 0
+            self.subiu = False
+            
     def tiro_boss(self):
         novo_tiro_boss1 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 0 , 10 )
-        novo_tiro_boss2 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 3, 10 )
-        novo_tiro_boss3 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , -3 , 10 )
+        novo_tiro_boss2 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 5, 10 )
+        novo_tiro_boss3 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , -5 , 10 )
         self.todos_tiros_boss.add(novo_tiro_boss1)
         self.todos_tiros_boss.add(novo_tiro_boss2)
         self.todos_tiros_boss.add(novo_tiro_boss3)
@@ -473,7 +495,7 @@ class explod_inimigo(pygame.sprite.Sprite):#Representa a animação de explosão
             self.image = self.explosao[self.frame]#Define nova imagem
             self.rect = self.image.get_rect()#Captura o espaço retangular da imagem
             self.rect.center =  centro#Define a posição em 'x' e 'y' do centro da imagem
-
+       
 
 
 class canhao_inimigo_anim(pygame.sprite.Sprite):
@@ -522,6 +544,45 @@ class canhao_inimigo_anim(pygame.sprite.Sprite):
                 self.rect.x = 595#Reposiciona a animação
             if self.rect.x < -30:#Verifica se a animação passou do limite negativo da tela 
                 self.rect.x = -29#Reposiciona a animação
+
+class explod_boss(pygame.sprite.Sprite):#Representa a animação de explosão do inimigo
+   
+   def __init__(self, centro, assets):#Construtor da classe
+        
+        pygame.sprite.Sprite.__init__(self)#Construtor da classe mãe 
+
+        self.explosao_boss = assets['anim_explod_boss']#atributo que armazena as imagens da animação
+        self.frame = 0#numeração da imagem da animação
+        self.image = self.explosao_boss[self.frame]#Define a imagem atual da animação
+        self.rect = self.image.get_rect()#Captura a área retangular da imagem
+        self.rect.center = centro#Define a posição em 'x' e 'y' do centro da imagem
+        self.ultima_vez = pygame.time.get_ticks()#Captura o tempo 
+
+
+        self.temporizador = 50 #Tempo necessário para que rode outra animação
+
+   def update(self):#atualiza a classe 
+        agora = pygame.time.get_ticks()#Captura o tempo atual 
+
+
+        tempo_decorrido = agora - self.temporizador#Verifica o tempo decorrido
+
+        if tempo_decorrido > self.temporizador:#condição para que a animação continue a rodar 
+
+            self.ultima_vez = agora#Captura o tempo da ultima animação
+
+
+            self.frame += 1#atualiza a que será usada
+
+        if self.frame == len(self.explosao_boss):#verifica se chegou à ultima imagem
+            self.kill()#finaliza a animação
+
+        else:
+
+            centro = self.rect.center#Atualiza a posição da animação 
+            self.image = self.explosao_boss[self.frame]#Define nova imagem
+            self.rect = self.image.get_rect()#Captura o espaço retangular da imagem
+            self.rect.center =  centro#Define a posição em 'x' e 'y' do centro da imagem
             
 
 
@@ -573,7 +634,8 @@ regenerando = 4
 playing = 2
 tela_inicio = 0
 game_over = 6
-venceu = 7
+matou_boss = 7
+venceu = 8
 state = tela_inicio
 
 #Estados do estágio do jogo 
@@ -689,22 +751,32 @@ while state != game_over and state != venceu:
         tempo_morte =  pygame.time.get_ticks()
         if tempo_morte - morreu > 1500:
             state = game_over
+
+
+    elif state == matou_boss:
+        explosao_boss = explod_boss(navio_boss.rect.center, assets)
+        all_sprites.add(explosao_boss)
+        navio_boss.kill()
+        agora2 = pygame.time.get_ticks()
+        if agora2 - boss_atingido > 1500:
+            state = venceu
     
     
-    if tempo_fase1 - (1000 * 90) > 0 and status_fase == fase_1:
+    if tempo_fase1 - (1000 * 60) > 0 and status_fase == fase_1:
         status_fase = fase_final
         assets['boss_chegando'].play()
         for tiro_inimigo2 in todos_tiros_inimigo:
             tiro_inimigo2.kill()
         for navio_inimigo_morrer in todos_inimigos:
                 navio_inimigo_morrer.kill() 
-        all_sprites.add(navio_boss)       
-        navio_boss.tiro_boss()
-        contagem_tiro_boss = 0
+        all_sprites.add(navio_boss)  
+        if vidas_boss > 0:
+            navio_boss.tiro_boss()
+            contagem_tiro_boss = 0
     
     if status_fase == fase_final:
         contagem_tiro_boss += 1
-        if contagem_tiro_boss % 75 == 0:
+        if contagem_tiro_boss % 75 == 0 and vidas_boss > 0:
             navio_boss.tiro_boss()
         if state == playing:
             hits3 =  pygame.sprite.spritecollide(navio_amigo , todos_boss , False , pygame.sprite.collide_mask)
@@ -721,10 +793,10 @@ while state != game_over and state != venceu:
             if len(hits4) > 0:
                 for chave, valor in hits4.items():
                     vidas_boss -= 1
+                    boss_atingido = pygame.time.get_ticks()
                     if vidas_boss == 0:
                         chave.kill()
-                        state = venceu
-
+                        state = matou_boss
                     for termo in valor: 
                         termo.kill()
             hits5 = pygame.sprite.groupcollide(todos_amigo , groups['todos_tiros_boss'] , False , True , pygame.sprite.collide_mask)
@@ -766,6 +838,10 @@ while state != game_over and state != venceu:
     for i in range(vidas):#loop para gerar imagens das vidas 
         window.blit(assets['Imagem_vida'], (x_vida, y_vida))#desenha a imagem da vida na tela 
         x_vida += 25#move a posição da imagem no eixo 'x'
+
+    if state == regenerando:
+        regen = assets['fonte_regen'].render('Regenerando...', True, (255,255,255))
+        window.blit(regen , (largura/2 - 100 , 30))
     
 
     print(state)
@@ -785,14 +861,19 @@ while state == game_over:
 
 while state == venceu:
     clock.tick(FPS)
-    window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
-    window.fill( (0 , 0 , 0))
-    window.blit(assets['tela_vitoria'], imagem_fundo_rect)
+    if agora2 - boss_atingido > 15:
+        window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
+        window.fill( (0 , 0 , 0))
+        window.blit(assets['tela_vitoria'], imagem_fundo_rect)
 
-    pygame.display.update()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            state = acabou
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+             state = acabou
+    
+if state == regenerando:
+        regen = assets['fonte_regen'].render('Regenerando...', True, (255,255,255))
+        window.blit(regen , (largura/2 - 100 , 30))
 
 
 pygame.QUIT
