@@ -148,6 +148,11 @@ assets['jogador curando'].set_volume(0.6)
 
 assets['boss_chegando'] = pygame.mixer.Sound('Sons/som_boss_chegando.flac')
 assets['boss_chegando'].set_volume(0.9)
+
+assets['tiro_boss'] = pygame.mixer.Sound('Sons/son_explod_boss.wav')
+assets['tiro_boss'].set_volume(0.2)
+
+
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , assets , groups): #Essa classe baseia-se na entrada de uma imagem 
@@ -664,9 +669,9 @@ while state != acabou:
         tempo_morte =  pygame.time.get_ticks()
         if tempo_morte - morreu > 1500:
             state = acabou
+
     
-    
-    if tempo_fase1 - (1000 * 90) > 0 and status_fase == fase_1:
+    if tempo_fase1 - (1000 * 1) > 0 and status_fase == fase_1:
         status_fase = fase_final
         assets['boss_chegando'].play()
         for tiro_inimigo2 in todos_tiros_inimigo:
@@ -681,6 +686,7 @@ while state != acabou:
         contagem_tiro_boss += 1
         if contagem_tiro_boss % 75 == 0:
             navio_boss.tiro_boss()
+            assets['tiro_boss'].play()
         if state == playing:
             hits3 =  pygame.sprite.spritecollide(navio_amigo , todos_boss , False , pygame.sprite.collide_mask)
             if len(hits3) > 0:
