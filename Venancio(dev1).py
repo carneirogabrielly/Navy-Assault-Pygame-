@@ -2,7 +2,7 @@
 import pygame 
 import random 
 import time
-
+import math
 
 
 pygame.init() #Inicializa o framework do pygame 
@@ -71,7 +71,9 @@ assets['imagem_boss'] = pygame.transform.scale(assets['imagem_boss'] , (largura_
 assets['imagem_bala_boss'] = pygame.image.load('Imagens/Boss/Bala_de_canhão_boss.png')
 assets['imagem_bala_boss']  = pygame.transform.scale(assets['imagem_bala_boss'] , (largura_bala_boss , comprimento_bala_boss))
 
-
+imagem_fundo_bg = assets['imagem_fundo'].get_width()
+scroll = 0
+tiles = math.ceil(comprimento / imagem_fundo_bg) + 1
 
 
 anim_tiro_jogador = []
@@ -517,7 +519,6 @@ vidas_boss = 75
 vidas_ganhas = []#Armazena quais pontuações já cederam vida ao jogador 
 #placar
 placar = 0 
-
 #criando navios: 
 
 all_sprites = pygame.sprite.Group() #Uma lista que armazena todos os sprites do jogo 
@@ -710,14 +711,9 @@ while state != acabou:
                         state = perdeu_vidas
                         morreu = pygame.time.get_ticks()
             
-
-            
-            
-
-
-
+       
     #Gera saídas 
-    window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
+    window.fill( (0 , 0 , 0)) 
     window.blit(assets['imagem_fundo'] , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
     if status_fase == fase_1:
         window.blit(assets['imagem_placar'] , (550 , 5))  #desenha a imagem do placar na janela do jogo 
