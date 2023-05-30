@@ -1,7 +1,9 @@
+
 import pygame 
 import random 
 import time
 import math
+
 
 pygame.init() #Inicializa o framework do pygame 
 pygame.mixer.init()
@@ -30,6 +32,14 @@ comrpimento_tiro = 35
 largura_vida = 50
 comprimento_vida = 50
 
+#Tamanho do Boss
+largura_boss = 250
+comprimento_boss = 300
+
+#Bala do Boss 
+largura_bala_boss = 55
+comprimento_bala_boss = 55 
+
 
 #Imagens
 assets = {}
@@ -55,11 +65,16 @@ assets['Imagem_vida'] = pygame.transform.scale(assets['imagem_jogador'], (largur
 
 assets['fonte_placar'] = pygame.font.SysFont('cooper black' , 28 , True , False)
 
+assets['imagem_boss']  = pygame.image.load('Imagens/Boss/Boss.png')
+assets['imagem_boss'] = pygame.transform.scale(assets['imagem_boss'] , (largura_boss , comprimento_boss))
 
-#Definindo variaveis do scroll
+assets['imagem_bala_boss'] = pygame.image.load('Imagens/Boss/Bala_de_canhão_boss.png')
+assets['imagem_bala_boss']  = pygame.transform.scale(assets['imagem_bala_boss'] , (largura_bala_boss , comprimento_bala_boss))
+
 imagem_fundo_bg = assets['imagem_fundo'].get_width()
 scroll = 0
 tiles = math.ceil(comprimento / imagem_fundo_bg) + 1
+
 
 anim_tiro_jogador = []
 
@@ -124,6 +139,15 @@ assets['som da explosão do inimigo'].set_volume(0.2)
 
 assets['som do jogador travado'] = pygame.mixer.Sound('Sons/navio_n_atira.wav')
 assets['som do jogador travado'].set_volume(0.4)
+
+assets['jogador colidindo'] = pygame.mixer.Sound('Sons/contato_com_navio.wav')
+assets['jogador colidindo'].set_volume(0.3)
+
+assets['jogador curando'] = pygame.mixer.Sound('Sons/barco_curando.wav')
+assets['jogador curando'].set_volume(0.6)
+
+assets['boss_chegando'] = pygame.mixer.Sound('Sons/som_boss_chegando.flac')
+assets['boss_chegando'].set_volume(0.9)
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , assets , groups): #Essa classe baseia-se na entrada de uma imagem 
@@ -241,6 +265,73 @@ class Tiro_inimigo(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
+
+class Boss(pygame.sprite.Sprite):
+    def __init__(self , assets , groups):
+        pygame.sprite.Sprite.__init__(self)
+        self.image= assets['imagem_boss'] 
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = largura/2
+        self.rect.bottom = 200
+        self.vx_boss = 2
+        self.vy_boss = 1
+        self.todos_tiros_boss = groups['todos_tiros_boss']
+        self.all_sprites = groups['all_sprites']
+        self.imagem_tiro_boss = assets['imagem_bala_boss']
+
+        self.tempo = pygame.time.get_ticks()
+
+        
+    def update(self):
+        self.rect.x += self.vx_boss
+        self.rect.y += self.vy_boss
+        
+        #Condições para reposcionar o inimigo: 
+        if self.rect.x > 450:
+            self.rect.x = 449
+            self.vx_boss = self.vx_boss * -1
+        if self.rect.x <  -30:
+            self.rect.x = -30 
+            self.vx_boss = self.vx_boss * -1 
+        if self.rect.top > 700:
+            self.rect.y = 1
+            self.rect.x = random.randint(0 , 300)
+        if self.rect.bottom == comprimento + 10:
+            self.vy_boss = - 10
+            self.vx_boss = 0
+        if self.rect.top == -40:
+            self.vx_boss = 2
+            self.vy_boss = 1
+    def tiro_boss(self):
+        novo_tiro_boss1 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 0 , 10 )
+        novo_tiro_boss2 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 3, 10 )
+        novo_tiro_boss3 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , -3 , 10 )
+        self.todos_tiros_boss.add(novo_tiro_boss1)
+        self.todos_tiros_boss.add(novo_tiro_boss2)
+        self.todos_tiros_boss.add(novo_tiro_boss3)
+        self.all_sprites.add(novo_tiro_boss1)
+        self.all_sprites.add(novo_tiro_boss2)
+        self.all_sprites.add(novo_tiro_boss3)
+
+class Tiro_boss(pygame.sprite.Sprite):
+    def __init__(self, img , bottom , centerx , vx_tiro_boss , vy_tiro_boss):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect.centerx = centerx
+        self.rect.bottom = bottom
+        self.vy_tiro_boss = vy_tiro_boss
+        self.vx_tiro_boss = vx_tiro_boss
+    def update(self):
+        self.rect.x += self.vx_tiro_boss
+        self.rect.y += self.vy_tiro_boss
+
+        if self.rect.left > largura or self.rect.right < 0:
+            self.kill()
+        if self.rect.bottom > comprimento:
+            self.kill()
 
 class canhao_anim(pygame.sprite.Sprite):
 
@@ -421,24 +512,23 @@ class canhao_inimigo_anim(pygame.sprite.Sprite):
             
 
 
-#----Inicializa estrutura de dados 
-game = True
+
 #quantidade de vidas do jogador
 vidas = 3
+vidas_boss = 75
 vidas_ganhas = []#Armazena quais pontuações já cederam vida ao jogador 
 #placar
 placar = 0 
-
 #criando navios: 
 
 all_sprites = pygame.sprite.Group() #Uma lista que armazena todos os sprites do jogo 
 
 todos_tiros = pygame.sprite.Group() #Lista que armazena somente os tiros do jogador 
-
+todos_amigo = pygame.sprite.Group()
 todos_tiros_inimigo = pygame.sprite.Group()#lista que armazena todos os tiros dos inimigos 
-
+todos_tiros_boss = pygame.sprite.Group()
 n_inimigos = 4 #variável que armazena a quantidade de inimigos 
-
+todos_boss = pygame.sprite.Group()
 todos_inimigos = pygame.sprite.Group()#lista que armazena todos os inimigos
 
 groups = {}
@@ -446,7 +536,7 @@ groups['all_sprites'] = all_sprites
 groups['todos_tiros'] = todos_tiros
 groups['todos_tiros_inimigo'] = todos_tiros_inimigo
 groups['todos_inimigos'] = todos_inimigos
-
+groups['todos_tiros_boss'] = todos_tiros_boss
 for i in range(n_inimigos):#loop para armazenar todos os inimigos dentro do grupo
 
     navio = Inimigo(assets , groups)#Gerador do barco inimigo 
@@ -455,24 +545,31 @@ for i in range(n_inimigos):#loop para armazenar todos os inimigos dentro do grup
 
 navio_amigo = jogador(assets, groups)#gerador do navio do jogador 
 all_sprites.add(navio_amigo)#adiciona o navio à lista de sprites 
-
-
+navio_boss = Boss( assets , groups )
+todos_boss.add(navio_boss)
+todos_amigo.add(navio_amigo)
 #Relógio que controla o loop
 clock = pygame.time.Clock()
 
 FPS = 50  #quantidade de imagens que são mostradas na tela por segundo 
 tempo_inimigo = 0 #tempo em que o inimigo ira atirar 
 
-#Iniciando a utilização de estados: 
+#Estados do próprio jogador  
 acabou = 0 
 perdeu_vidas = 1
 regenerando = 2 
 playing = 3 
 state = playing
+
+#Estados do estágio do jogo 
+fase_1 = 10
+fase_final = 20 
+status_fase = fase_1
 #----Loop principal do jogo ---
 pygame.mixer.music.play(loops=-1)
 while state != acabou: 
     clock.tick(FPS) 
+    tempo_fase1 = pygame.time.get_ticks()
     tempo_inimigo += 1 #adiciona tempo ao ocntador 
     if tempo_inimigo == 50:#verifica se já passou  o tempo necessário para o inimigo atirar 
         for i in todos_inimigos: #loop para acessar todos os inimigos dentro da lista
@@ -512,13 +609,13 @@ while state != acabou:
 
     all_sprites.update()#atualiza todos os eventos dos sprites dentro dos grupos 
     
-    if state == playing: 
+    if state == playing and status_fase == fase_1: 
         if pygame.sprite.spritecollide(navio_amigo, todos_inimigos, True, pygame.sprite.collide_mask):#verifica se houve colizão entre o jogador e algum inimigo
             novo_inimigo = Inimigo(assets , groups)  #cria inimigo novamente 
             all_sprites.add(novo_inimigo)  #Adiciona sprite do inimigo no grupo de todos os sprites 
             todos_inimigos.add(novo_inimigo)  #Adiciona sprite do inimigo no grupo de sprites dos inimigos 
             vidas -= 1   #Diminui a quantidade de vida do jogador 
-            print('navio')
+            assets['jogador colidindo'].play()
             placar -= 1000   #Reduz a pontuação do jogador 
             assets['som da explosão do inimigo'].play() #Roda o som da explosão do inimigo
             if vidas > 0: 
@@ -543,7 +640,8 @@ while state != acabou:
         
         if pygame.sprite.spritecollide(navio_amigo, groups['todos_tiros_inimigo'], True, pygame.sprite.collide_mask):#Verifica colisão do jogdor com os tiros inimigos
             vidas -= 1     #Reduz a quantidade de vidas 
-            placar -= 500  #Reduz a quantidade de pontos 
+            placar -= 500 #Reduz a quantidade de pontos
+            assets['jogador colidindo'].play()  
             if vidas > 0: 
                 state = regenerando
                 tomou_tiro = pygame.time.get_ticks()
@@ -552,6 +650,7 @@ while state != acabou:
                 morreu = pygame.time.get_ticks()
     elif state == regenerando:
             now = pygame.time.get_ticks()
+            assets['jogador curando'].play()
             if now - tomou_tiro > 3000:
                 state = playing
                 now = 0 
@@ -563,34 +662,70 @@ while state != acabou:
         navio_amigo.kill()#Remove o navio do grupo de sprites 
         assets['som da explosão do jogador'].play()#Roda o som de explosão do navio do jogador
         tempo_morte =  pygame.time.get_ticks()
-        if tempo_morte - morreu > 3000:
+        if tempo_morte - morreu > 1500:
             state = acabou
-     
+    
+    
+    if tempo_fase1 - (1000 * 90) > 0 and status_fase == fase_1:
+        status_fase = fase_final
+        assets['boss_chegando'].play()
+        for tiro_inimigo2 in todos_tiros_inimigo:
+            tiro_inimigo2.kill()
+        for navio_inimigo_morrer in todos_inimigos:
+                navio_inimigo_morrer.kill() 
+        all_sprites.add(navio_boss)       
+        navio_boss.tiro_boss()
+        contagem_tiro_boss = 0
+    
+    if status_fase == fase_final:
+        contagem_tiro_boss += 1
+        if contagem_tiro_boss % 75 == 0:
+            navio_boss.tiro_boss()
+        if state == playing:
+            hits3 =  pygame.sprite.spritecollide(navio_amigo , todos_boss , False , pygame.sprite.collide_mask)
+            if len(hits3) > 0:
+                vidas -= 1 
+                if vidas > 0:
+                    state = regenerando
+                    tomou_tiro = pygame.time.get_ticks()
+                if vidas == 0:
+                    state = perdeu_vidas
+                    morreu = pygame.time.get_ticks()
+            
+            hits4 = pygame.sprite.groupcollide(todos_boss , groups['todos_tiros'] , False, True, pygame.sprite.collide_mask)
+            if len(hits4) > 0:
+                for chave, valor in hits4.items():
+                    vidas_boss -= 1 
+                    if vidas_boss == 0:
+                        chave.kill()
+                    for termo in valor: 
+                        termo.kill()
+            hits5 = pygame.sprite.groupcollide(todos_amigo , groups['todos_tiros_boss'] , False , True , pygame.sprite.collide_mask)
+            if len(hits5) > 0:
+                for key, value in hits5.items():
+                    vidas -= 1 
+                    if vidas > 0:
+                        state = regenerando
+                        tomou_tiro = pygame.time.get_ticks()
+                    else:
+                        state = perdeu_vidas
+                        morreu = pygame.time.get_ticks()
+            
+       
     #Gera saídas 
-    window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
-    window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
-    for i in range(0, tiles):
-            window.blit(assets['imagem_fundo'], (0, i * imagem_fundo_bg + scroll))
-    
-    #Colocando o scrool no fundo
-    scroll -= 5
-    
-    #Resetando o scroll
-    if abs(scroll) > imagem_fundo_bg:
-        scroll = 0
-        
-    window.blit(assets['imagem_placar'] , (550 , 5))#desenha a imagem do placar na janela do jogo 
-    all_sprites.draw(window)#Desenha as imagens de todos os sprites na janela do jogo 
-    window.blit(assets['imagem_placar'] , (550 , 5))#desenha a imagem do placar na janela do jogo 
+    window.fill( (0 , 0 , 0)) 
+    window.blit(assets['imagem_fundo'] , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
+    if status_fase == fase_1:
+        window.blit(assets['imagem_placar'] , (550 , 5))  #desenha a imagem do placar na janela do jogo 
     all_sprites.draw(window)#Desenha as imagens de todos os sprites na janela do jogo 
 
     #Colocando placar
-    superficie_placar = assets['fonte_placar'].render("{0}".format(placar) , True , (255 , 255 , 255))#guarda a imagem da quantidade de pontos que será mostrada 
-    window.blit(superficie_placar , (560 , 40))#desenha a quantidade de pontos na janela 
-
+    if status_fase == fase_1:
+        superficie_placar = assets['fonte_placar'].render("{0}".format(placar) , True , (255 , 255 , 255))#guarda a imagem da quantidade de pontos que será mostrada 
+        window.blit(superficie_placar , (560 , 40))#desenha a quantidade de pontos na janela 
     #Colocando vidas
-    x_vida = 25#posição inicial da imagem de vidas no eixo 'x' 
-    y_vida = 10#posição inicial da imagem de vidas no eixo 'y'
+    x_vida = 25  #posição inicial da imagem de vidas no eixo 'x' 
+    y_vida = 10  #posição inicial da imagem de vidas no eixo 'y'
     for i in range(vidas):#loop para gerar imagens das vidas 
         window.blit(assets['Imagem_vida'], (x_vida, y_vida))#desenha a imagem da vida na tela 
         x_vida += 25#move a posição da imagem no eixo 'x'
