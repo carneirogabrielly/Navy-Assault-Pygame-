@@ -656,6 +656,9 @@ while state != game_over and state != venceu and state != acabou:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     state = playing
+
+            if event.type == pygame.QUIT:
+                state = acabou
     tempo_fase1 = pygame.time.get_ticks()
     tempo_inimigo += 1 #adiciona tempo ao ocntador 
     if tempo_inimigo == 50:#verifica se já passou  o tempo necessário para o inimigo atirar 
