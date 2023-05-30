@@ -45,6 +45,16 @@ comprimento_bala_boss = 55
 assets = {}
 assets['imagem_fundo'] = pygame.image.load('Imagens/Fundo.png').convert() #Inicializa a imagem no pygame 
 assets['imagem_fundo'] = pygame.transform.scale(assets['imagem_fundo'] , (650,800)) #Converte a imagem para a escala 
+imagem_fundo_rect = assets['imagem_fundo'].get_rect()
+
+assets['imagem_inicial'] = pygame.image.load('Imagens/tela_inicio.png').convert()
+assets['imagem_inicial'] = pygame.transform.scale(assets['imagem_inicial'] , (650,800))
+
+assets['game_over'] = pygame.image.load('Imagens/tela_game_over.png').convert()
+assets['game_over'] = pygame.transform.scale(assets['game_over'], (650,800))
+
+assets['tela_vitoria'] = pygame.image.load('Imagens/tela_vitoria.png')
+assets['tela_vitoria'] = pygame.transform.scale(assets['tela_vitoria'], (650,800))
 
 assets['imagem_oponente'] = pygame.image.load('Imagens/Barco_inimigo/Barco_inimigo.png').convert_alpha()
 assets['imagem_oponente'] = pygame.transform.scale(assets['imagem_oponente'] , (largura_oponente,comprimento_oponente))
@@ -148,6 +158,12 @@ assets['jogador curando'].set_volume(0.6)
 
 assets['boss_chegando'] = pygame.mixer.Sound('Sons/som_boss_chegando.flac')
 assets['boss_chegando'].set_volume(0.9)
+
+#Definindo variaveis do scroll
+imagem_fundo_bg = assets['imagem_fundo'].get_width()
+scroll = 0
+tiles = math.ceil(comprimento / imagem_fundo_bg) + 1
+
 #Classe do navio inimigo 
 class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos 
     def __init__(self , assets , groups): #Essa classe baseia-se na entrada de uma imagem 
@@ -509,10 +525,6 @@ class canhao_inimigo_anim(pygame.sprite.Sprite):
             
 
 
-            
-
-
-
 #quantidade de vidas do jogador
 vidas = 3
 vidas_boss = 75
@@ -555,11 +567,14 @@ FPS = 50  #quantidade de imagens que são mostradas na tela por segundo
 tempo_inimigo = 0 #tempo em que o inimigo ira atirar 
 
 #Estados do próprio jogador  
-acabou = 0 
-perdeu_vidas = 1
-regenerando = 2 
-playing = 3 
-state = playing
+acabou = 5
+perdeu_vidas = 3
+regenerando = 4
+playing = 2
+tela_inicio = 0
+game_over = 6
+venceu = 7
+state = tela_inicio
 
 #Estados do estágio do jogo 
 fase_1 = 10
@@ -567,8 +582,19 @@ fase_final = 20
 status_fase = fase_1
 #----Loop principal do jogo ---
 pygame.mixer.music.play(loops=-1)
-while state != acabou: 
+while state != game_over and state != venceu: 
     clock.tick(FPS) 
+    while state == tela_inicio:
+        window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
+        window.fill( (0 , 0 , 0))
+        window.blit(assets['imagem_inicial'], imagem_fundo_rect)
+        
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    state = playing
     tempo_fase1 = pygame.time.get_ticks()
     tempo_inimigo += 1 #adiciona tempo ao ocntador 
     if tempo_inimigo == 50:#verifica se já passou  o tempo necessário para o inimigo atirar 
@@ -655,7 +681,6 @@ while state != acabou:
                 state = playing
                 now = 0 
     
-    
     elif state == perdeu_vidas:
         morte_jogador = explo_jogador(navio_amigo.rect.center, assets)#roda animação de explosão do navio do jogador 
         all_sprites.add(morte_jogador)#adiciona a animação no grupo de todas as sprites 
@@ -663,7 +688,7 @@ while state != acabou:
         assets['som da explosão do jogador'].play()#Roda o som de explosão do navio do jogador
         tempo_morte =  pygame.time.get_ticks()
         if tempo_morte - morreu > 1500:
-            state = acabou
+            state = game_over
     
     
     if tempo_fase1 - (1000 * 90) > 0 and status_fase == fase_1:
@@ -695,9 +720,11 @@ while state != acabou:
             hits4 = pygame.sprite.groupcollide(todos_boss , groups['todos_tiros'] , False, True, pygame.sprite.collide_mask)
             if len(hits4) > 0:
                 for chave, valor in hits4.items():
-                    vidas_boss -= 1 
+                    vidas_boss -= 1
                     if vidas_boss == 0:
                         chave.kill()
+                        state = venceu
+
                     for termo in valor: 
                         termo.kill()
             hits5 = pygame.sprite.groupcollide(todos_amigo , groups['todos_tiros_boss'] , False , True , pygame.sprite.collide_mask)
@@ -715,6 +742,16 @@ while state != acabou:
     #Gera saídas 
     window.fill( (0 , 0 , 0)) 
     window.blit(assets['imagem_fundo'] , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
+    for i in range(0, tiles):
+        window.blit(assets['imagem_fundo'], (0, i * imagem_fundo_bg + scroll))
+    
+    #Colocando o scrool no fundo
+    scroll -= 5
+    
+    #Resetando o scroll
+    if abs(scroll) > imagem_fundo_bg:
+        scroll = 0
+
     if status_fase == fase_1:
         window.blit(assets['imagem_placar'] , (550 , 5))  #desenha a imagem do placar na janela do jogo 
     all_sprites.draw(window)#Desenha as imagens de todos os sprites na janela do jogo 
@@ -729,8 +766,33 @@ while state != acabou:
     for i in range(vidas):#loop para gerar imagens das vidas 
         window.blit(assets['Imagem_vida'], (x_vida, y_vida))#desenha a imagem da vida na tela 
         x_vida += 25#move a posição da imagem no eixo 'x'
-      
-    #Autaliza estado do jogo 
+    
+
+    print(state)
+        #Autaliza estado do jogo 
     pygame.display.update() #Atualiza o estado do jogo observado a cada loop
 #--- Finalização 
-pygame.quit() #Finaliza o game     
+while state == game_over:
+    clock.tick(FPS)
+    window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
+    window.fill( (0 , 0 , 0))
+    window.blit(assets['game_over'], imagem_fundo_rect)
+
+    pygame.display.update()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            state = acabou
+
+while state == venceu:
+    clock.tick(FPS)
+    window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
+    window.fill( (0 , 0 , 0))
+    window.blit(assets['tela_vitoria'], imagem_fundo_rect)
+
+    pygame.display.update()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            state = acabou
+
+
+pygame.QUIT
