@@ -271,19 +271,23 @@ class Boss(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.centerx = largura/2
-        self.rect.bottom = 130
+        self.rect.bottom = 200
         self.vx_boss = 2
         self.vy_boss = 1
         self.todos_tiros_boss = groups['todos_tiros_boss']
         self.all_sprites = groups['all_sprites']
         self.imagem_tiro_boss = assets['imagem_bala_boss']
+
+        self.tempo = pygame.time.get_ticks()
+
+        
     def update(self):
         self.rect.x += self.vx_boss
         self.rect.y += self.vy_boss
         
         #Condições para reposcionar o inimigo: 
-        if self.rect.x > 490:
-            self.rect.x = 490
+        if self.rect.x > 450:
+            self.rect.x = 449
             self.vx_boss = self.vx_boss * -1
         if self.rect.x <  -30:
             self.rect.x = -30 
@@ -291,16 +295,23 @@ class Boss(pygame.sprite.Sprite):
         if self.rect.top > 700:
             self.rect.y = 1
             self.rect.x = random.randint(0 , 300)
+        if self.rect.bottom == comprimento + 10:
+            self.vy_boss = - 10
+            self.vx_boss = 0
+        if self.rect.top == -40:
+            self.vx_boss = 2
+            self.vy_boss = 1
     def tiro_boss(self):
-        novo_tiro_boss1 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 0 , 15 )
-        novo_tiro_boss2 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 2 , 15 )
-        novo_tiro_boss3 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , -2 , 15 )
+        novo_tiro_boss1 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 0 , 10 )
+        novo_tiro_boss2 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 3, 10 )
+        novo_tiro_boss3 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , -3 , 10 )
         self.todos_tiros_boss.add(novo_tiro_boss1)
         self.todos_tiros_boss.add(novo_tiro_boss2)
         self.todos_tiros_boss.add(novo_tiro_boss3)
         self.all_sprites.add(novo_tiro_boss1)
         self.all_sprites.add(novo_tiro_boss2)
         self.all_sprites.add(novo_tiro_boss3)
+
 class Tiro_boss(pygame.sprite.Sprite):
     def __init__(self, img , bottom , centerx , vx_tiro_boss , vy_tiro_boss):
         pygame.sprite.Sprite.__init__(self)
