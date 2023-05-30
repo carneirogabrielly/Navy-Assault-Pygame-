@@ -66,6 +66,8 @@ assets['fonte_placar'] = pygame.font.SysFont('cooper black' , 28 , True , False)
 
 #Definindo variaveis do scroll
 imagem_fundo_bg = assets['imagem_fundo'].get_width()
+print(imagem_fundo_bg)
+print(imagem_fundo_rect)
 scroll = 0
 tiles = math.ceil(comprimento / imagem_fundo_bg) + 1
 
