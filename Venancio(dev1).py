@@ -513,7 +513,7 @@ class canhao_inimigo_anim(pygame.sprite.Sprite):
 
 #quantidade de vidas do jogador
 vidas = 3
-vidas_boss = 25
+vidas_boss = 50
 vidas_ganhas = []#Armazena quais pontuações já cederam vida ao jogador 
 #placar
 placar = 0 
@@ -523,11 +523,11 @@ placar = 0
 all_sprites = pygame.sprite.Group() #Uma lista que armazena todos os sprites do jogo 
 
 todos_tiros = pygame.sprite.Group() #Lista que armazena somente os tiros do jogador 
-
+todos_amigo = pygame.sprite.Group()
 todos_tiros_inimigo = pygame.sprite.Group()#lista que armazena todos os tiros dos inimigos 
 todos_tiros_boss = pygame.sprite.Group()
 n_inimigos = 4 #variável que armazena a quantidade de inimigos 
-
+todos_boss = pygame.sprite.Group()
 todos_inimigos = pygame.sprite.Group()#lista que armazena todos os inimigos
 
 groups = {}
@@ -545,8 +545,8 @@ for i in range(n_inimigos):#loop para armazenar todos os inimigos dentro do grup
 navio_amigo = jogador(assets, groups)#gerador do navio do jogador 
 all_sprites.add(navio_amigo)#adiciona o navio à lista de sprites 
 navio_boss = Boss( assets , groups )
-
-
+todos_boss.add(navio_boss)
+todos_amigo.add(navio_amigo)
 #Relógio que controla o loop
 clock = pygame.time.Clock()
 
@@ -661,9 +661,11 @@ while state != acabou:
         navio_amigo.kill()#Remove o navio do grupo de sprites 
         assets['som da explosão do jogador'].play()#Roda o som de explosão do navio do jogador
         tempo_morte =  pygame.time.get_ticks()
-        if tempo_morte - morreu > 3000:
+        if tempo_morte - morreu > 1500:
             state = acabou
-    if tempo_fase1 - 5000 > 0 and status_fase == fase_1:
+    
+    
+    if tempo_fase1 - (1000 * 1) > 0 and status_fase == fase_1:
         status_fase = fase_final
         assets['boss_chegando'].play()
         for tiro_inimigo2 in todos_tiros_inimigo:
@@ -678,7 +680,37 @@ while state != acabou:
         contagem_tiro_boss += 1
         if contagem_tiro_boss % 75 == 0:
             navio_boss.tiro_boss()
-        
+        if state == playing:
+            hits3 =  pygame.sprite.spritecollide(navio_amigo , todos_boss , False , pygame.sprite.collide_mask)
+            if len(hits3) > 0:
+                vidas -= 1 
+                if vidas > 0:
+                    state = regenerando
+                    tomou_tiro = pygame.time.get_ticks()
+                if vidas == 0:
+                    state = perdeu_vidas
+                    morreu = pygame.time.get_ticks()
+            
+            hits4 = pygame.sprite.groupcollide(todos_boss , groups['todos_tiros'] , False, True, pygame.sprite.collide_mask)
+            if len(hits4) > 0:
+                for chave, valor in hits4.items():
+                    vidas_boss -= 1 
+                    if vidas_boss == 0:
+                        chave.kill()
+                    for termo in valor: 
+                        termo.kill()
+            hits5 = pygame.sprite.groupcollide(todos_amigo , groups['todos_tiros_boss'] , False , True , pygame.sprite.collide_mask)
+            if len(hits5) > 0:
+                for key, value in hits5.items():
+                    vidas -= 1 
+                    if vidas > 0:
+                        state = regenerando
+                        tomou_tiro = pygame.time.get_ticks()
+                    else:
+                        state = perdeu_vidas
+                        morreu = pygame.time.get_ticks()
+            
+
             
             
 
@@ -687,15 +719,17 @@ while state != acabou:
     #Gera saídas 
     window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
     window.blit(assets['imagem_fundo'] , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
-    window.blit(assets['imagem_placar'] , (550 , 5))  #desenha a imagem do placar na janela do jogo 
+    if status_fase == fase_1:
+        window.blit(assets['imagem_placar'] , (550 , 5))  #desenha a imagem do placar na janela do jogo 
     all_sprites.draw(window)#Desenha as imagens de todos os sprites na janela do jogo 
 
     #Colocando placar
-    superficie_placar = assets['fonte_placar'].render("{0}".format(placar) , True , (255 , 255 , 255))#guarda a imagem da quantidade de pontos que será mostrada 
-    window.blit(superficie_placar , (560 , 40))#desenha a quantidade de pontos na janela 
+    if status_fase == fase_1:
+        superficie_placar = assets['fonte_placar'].render("{0}".format(placar) , True , (255 , 255 , 255))#guarda a imagem da quantidade de pontos que será mostrada 
+        window.blit(superficie_placar , (560 , 40))#desenha a quantidade de pontos na janela 
     #Colocando vidas
-    x_vida = 25#posição inicial da imagem de vidas no eixo 'x' 
-    y_vida = 10#posição inicial da imagem de vidas no eixo 'y'
+    x_vida = 25  #posição inicial da imagem de vidas no eixo 'x' 
+    y_vida = 10  #posição inicial da imagem de vidas no eixo 'y'
     for i in range(vidas):#loop para gerar imagens das vidas 
         window.blit(assets['Imagem_vida'], (x_vida, y_vida))#desenha a imagem da vida na tela 
         x_vida += 25#move a posição da imagem no eixo 'x'
