@@ -800,7 +800,7 @@ def tela_jogo(window):
                 if now - tomou_tiro > 3000:
                     state = playing
                     now = 0 
-        
+        #Verifica se o perdeu todas vidas 
         elif state == perdeu_vidas:
             morte_jogador = explo_jogador(navio_amigo.rect.center, assets)#roda animação de explosão do navio do jogador 
             all_sprites.add(morte_jogador)#adiciona a animação no grupo de todas as sprites 
@@ -810,7 +810,7 @@ def tela_jogo(window):
             if tempo_morte - morreu > 1500:
                 state = game_over
 
-
+        #Verifcia se o boss foi  morto 
         elif state == matou_boss:
             assets['matou boss'].play()
             explosao_boss = explod_boss(navio_boss.rect.center, assets)
@@ -820,25 +820,25 @@ def tela_jogo(window):
             if agora2 - boss_atingido > 1500:
                 state = venceu
         
-        
+        #inicia  a segunda fase(boss)
         if tempo_fase1 - (1000 * 60) > 0 and status_fase == fase_1:
             status_fase = fase_final
-            assets['boss_chegando'].play()
-            for tiro_inimigo2 in todos_tiros_inimigo:
+            assets['boss_chegando'].play() #toca o som do boss chegando 
+            for tiro_inimigo2 in todos_tiros_inimigo: #Acaba com todos os disparos dos anivos inimigos 
                 tiro_inimigo2.kill()
-            for navio_inimigo_morrer in todos_inimigos:
+            for navio_inimigo_morrer in todos_inimigos:#Acaba com todos os navios inimigos 
                     navio_inimigo_morrer.kill() 
-            all_sprites.add(navio_boss)  
+            all_sprites.add(navio_boss)   # adiciona o boss no grupo de sprites 
             if vidas_boss > 0:
                 navio_boss.tiro_boss()
                 contagem_tiro_boss = 0
-        
+        #Verifica se está jogando contra o boss 
         if status_fase == fase_final:
             contagem_tiro_boss += 1
-            if contagem_tiro_boss % 75 == 0 and vidas_boss > 0:
-                navio_boss.tiro_boss()
-                assets['boss atirando'].play()
-            if state == playing:
+            if contagem_tiro_boss % 75 == 0 and vidas_boss > 0: #Verifica o tempo passado desde o ultimo disparo do boss
+                navio_boss.tiro_boss() #Faz o boss atirar 
+                assets['boss atirando'].play() #Toca o som de tiro do boss
+            if state == playing: #Verifica se o jogador ainda está vivo 
                 hits3 =  pygame.sprite.spritecollide(navio_amigo , todos_boss , False , pygame.sprite.collide_mask) # verifica se houve colisão entre o jogador e o boss
                 if len(hits3) > 0:
                     vidas -= 1 
