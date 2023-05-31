@@ -40,6 +40,7 @@
 
     4. Por fim, independente do estado em que ele queira encerrar o jogo, ele precisará apertar o 'x' , no topo da janela, para encerrá-lo. 
 
+    5. Vídeo do jogo:
 # Créditos 
 
     #Colaboradores: 
