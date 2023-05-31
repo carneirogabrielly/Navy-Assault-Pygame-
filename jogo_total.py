@@ -169,6 +169,11 @@ def carrega_imagens():
     assets['boss_chegando'] = pygame.mixer.Sound('Sons/som_boss_chegando.flac')
     assets['boss_chegando'].set_volume(0.9)
     
+    assets['matou boss'] = pygame.mixer.Sound('Sons/win_sound.wav')
+    assets['matou boss'].set_volume(0.9)
+
+    assets['boss atirando'] = pygame.mixer.Sound('Sons/son_explod_boss.wav')
+    assets['boss atirando'].set_volume(0.3)
     return assets
 
 assets = carrega_imagens()
@@ -758,6 +763,7 @@ def tela_jogo(window):
 
 
         elif state == matou_boss:
+            assets['matou boss'].play()
             explosao_boss = explod_boss(navio_boss.rect.center, assets)
             all_sprites.add(explosao_boss)
             navio_boss.kill()
@@ -766,7 +772,7 @@ def tela_jogo(window):
                 state = venceu
         
         
-        if tempo_fase1 - (1000 * 60) > 0 and status_fase == fase_1:
+        if tempo_fase1 - (1000 * 1) > 0 and status_fase == fase_1:
             status_fase = fase_final
             assets['boss_chegando'].play()
             for tiro_inimigo2 in todos_tiros_inimigo:
@@ -782,9 +788,11 @@ def tela_jogo(window):
             contagem_tiro_boss += 1
             if contagem_tiro_boss % 75 == 0 and vidas_boss > 0:
                 navio_boss.tiro_boss()
+                assets['boss atirando'].play()
             if state == playing:
                 hits3 =  pygame.sprite.spritecollide(navio_amigo , todos_boss , False , pygame.sprite.collide_mask)
                 if len(hits3) > 0:
+                    assets['jogador colidindo'].play()
                     vidas -= 1 
                     if vidas > 0:
                         state = regenerando
@@ -799,12 +807,14 @@ def tela_jogo(window):
                         vidas_boss -= 1
                         boss_atingido = pygame.time.get_ticks()
                         if vidas_boss == 0:
+                            
                             chave.kill()
                             state = matou_boss
                         for termo in valor: 
                             termo.kill()
                 hits5 = pygame.sprite.groupcollide(todos_amigo , groups['todos_tiros_boss'] , False , True , pygame.sprite.collide_mask)
                 if len(hits5) > 0:
+                    assets['jogador colidindo'].play()
                     for key, value in hits5.items():
                         vidas -= 1 
                         if vidas > 0:
