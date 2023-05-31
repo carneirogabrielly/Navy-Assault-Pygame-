@@ -839,7 +839,7 @@ def tela_jogo(window):
                 navio_boss.tiro_boss()
                 assets['boss atirando'].play()
             if state == playing:
-                hits3 =  pygame.sprite.spritecollide(navio_amigo , todos_boss , False , pygame.sprite.collide_mask)
+                hits3 =  pygame.sprite.spritecollide(navio_amigo , todos_boss , False , pygame.sprite.collide_mask) # verifica se houve colisão entre o jogador e o boss
                 if len(hits3) > 0:
                     vidas -= 1 
                     if vidas > 0:
@@ -849,7 +849,7 @@ def tela_jogo(window):
                         state = perdeu_vidas
                         morreu = pygame.time.get_ticks()
                 
-                hits4 = pygame.sprite.groupcollide(todos_boss , groups['todos_tiros'] , False, True, pygame.sprite.collide_mask)
+                hits4 = pygame.sprite.groupcollide(todos_boss , groups['todos_tiros'] , False, True, pygame.sprite.collide_mask) #aramazena a lsita de colisões entre o boss e o os tiros do jogador 
                 if len(hits4) > 0:
                     for chave, valor in hits4.items():
                         vidas_boss -= 1
@@ -858,20 +858,20 @@ def tela_jogo(window):
                             chave.kill()
                             state = matou_boss
                         for termo in valor: 
-                            termo.kill()
-                hits5 = pygame.sprite.groupcollide(todos_amigo , groups['todos_tiros_boss'] , False , True , pygame.sprite.collide_mask)
-                if len(hits5) > 0:
-                    for key, value in hits5.items():
-                        vidas -= 1 
-                        if vidas > 0:
-                            state = regenerando
-                            tomou_tiro = pygame.time.get_ticks()
+                            termo.kill() 
+                hits5 = pygame.sprite.groupcollide(todos_amigo , groups['todos_tiros_boss'] , False , True , pygame.sprite.collide_mask) #armazena a lista de colisões entre o navio do jogador e os tiros do inimigo 
+                if len(hits5) > 0: #verifica se houveram colisões 
+                    for i in hits5: # percorre a lista com as máscaras dos sprites que colidiram 
+                        vidas -= 1 # reduz a quantidade de vidas 
+                        if vidas > 0: # verifica se ainda restam vidas para o jogador 
+                            state = regenerando #troca o estado do jogador 
+                            tomou_tiro = pygame.time.get_ticks() #armazena o momento em que o jogador é atingido
                         else:
-                            state = perdeu_vidas
-                            morreu = pygame.time.get_ticks()
+                            state = perdeu_vidas # troca o estado do jogador 
+                            morreu = pygame.time.get_ticks() #Armazena o momento em que o  jogador perde todas suas vidas 
         
         #Gera saídas 
-        window.fill( (0 , 0 , 0)) 
+        window.fill( (0 , 0 , 0)) #preenche a tela de preto
         window.blit(assets['imagem_fundo'] , (0,0))   #Posiciona a imagem de fundo na janela window, na posição 0,0
         for i in range(0, tiles):
             window.blit(assets['imagem_fundo'], (0, i * imagem_fundo_bg + scroll))
@@ -888,7 +888,7 @@ def tela_jogo(window):
         all_sprites.draw(window)#Desenha as imagens de todos os sprites na janela do jogo 
 
         #Colocando placar
-        if status_fase == fase_1:
+        if status_fase == fase_1: #verifica o status atual da fase do jogador 
             superficie_placar = assets['fonte_placar'].render("{0}".format(placar) , True , (255 , 255 , 255))#guarda a imagem da quantidade de pontos que será mostrada 
             window.blit(superficie_placar , (560 , 40))#desenha a quantidade de pontos na janela 
         #Colocando vidas
@@ -898,41 +898,39 @@ def tela_jogo(window):
             window.blit(assets['Imagem_vida'], (x_vida, y_vida))#desenha a imagem da vida na tela 
             x_vida += 25#move a posição da imagem no eixo 'x'
 
-        if state == regenerando:
-            regen = assets['fonte_regen'].render('Regenerando...', True, (255,255,255))
-            window.blit(regen , (largura/2 - 100 , 30))
+        if state == regenerando: #Condicional para mostrar o alerta de regeneração
+            regen = assets['fonte_regen'].render('Regenerando...', True, (255,255,255)) #renderiza o texto na variável regen
+            window.blit(regen , (largura/2 - 100 , 30)) #desenha o texto de alerta de regeneração na tela 
         
 
             #Autaliza estado do jogo 
         pygame.display.update() #Atualiza o estado do jogo observado a cada loop
     #--- Finalização 
-    while state == game_over:
-        clock.tick(FPS)
+    while state == game_over: #condicional para trocar para tela de derrota
+        clock.tick(FPS)# roda os frames conforme a quantidade passada anterior mente
         window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
-        window.fill( (0 , 0 , 0))
-        window.blit(assets['game_over'], imagem_fundo_rect)
+        window.blit(assets['game_over'], imagem_fundo_rect) # preenche a tela com a imagem de fim de jogo 
 
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                state = acabou
+        pygame.display.update() # atualiza a tela 
+        for event in pygame.event.get(): # verifica todos as ações tomadas pelo jogador 
+            if event.type == pygame.QUIT: # verifica se o jogador aperto o botão de fechar a janela 
+                state = acabou # finaliza o jogo 
 
-    while state == venceu:
-        clock.tick(FPS)
-        if agora2 - boss_atingido > 15:
+    while state == venceu: #condicional para trocar para tela de vitória 
+        clock.tick(FPS) # roda os frames conforme a quantidade passada anterior mente 
+        if agora2 - boss_atingido > 15: # verifica o tempo passado após a morte do boss
             window.fill( (0 , 0 , 0)) #Colore a janela window com tudo em branco 
-            window.fill( (0 , 0 , 0))
-            window.blit(assets['tela_vitoria'], imagem_fundo_rect)
+            window.blit(assets['tela_vitoria'], imagem_fundo_rect) #desenha a imagem de vitória 
 
-            pygame.display.update()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    state = acabou
+            pygame.display.update() #atualiza o display
+            for event in pygame.event.get(): # verifica toda as ações tomadas pelo jogar 
+                if event.type == pygame.QUIT: #verifica o tipo do evento
+                    state = acabou # finaliza o jogo 
         
-    if state == regenerando:
-            regen = assets['fonte_regen'].render('Regenerando...', True, (255,255,255))
-            window.blit(regen , (largura/2 - 100 , 30))
+    if state == regenerando: # condicional para mostrar o alerta de regem 
+            regen = assets['fonte_regen'].render('Regenerando...', True, (255,255,255)) # carrega o texto de regeneração 
+            window.blit(regen , (largura/2 - 100 , 30)) #desenha o aviso de regeneração do barco 
 
-tela_jogo(window)
+tela_jogo(window) #chama a função d
 
-pygame.QUIT
+pygame.QUIT #fecha o jogo 
