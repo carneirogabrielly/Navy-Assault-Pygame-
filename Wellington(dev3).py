@@ -190,6 +190,12 @@ def carrega_imagens():
 
     assets['boss_chegando'] = pygame.mixer.Sound('Sons/som_boss_chegando.flac')
     assets['boss_chegando'].set_volume(0.9)
+
+    assets['matou boss'] = pygame.mixer.Sound('Sons/win_sound.wav')
+    assets['matou boss'].set_volume(0.9)
+
+    assets['boss atirando'] = pygame.mixer.Sound('Sons/son_explod_boss.wav')
+    assets['boss atirando'].set_volume(0.3)
     
     return assets
 
@@ -797,6 +803,7 @@ def tela_jogo(window):
 
 
         elif state == matou_boss:
+            assets['matou boss'].play()
             explosao_boss = explod_boss(navio_boss.rect.center, assets)
             all_sprites.add(explosao_boss)
             navio_boss.kill()
@@ -821,6 +828,7 @@ def tela_jogo(window):
             contagem_tiro_boss += 1
             if contagem_tiro_boss % 75 == 0 and vidas_boss > 0:
                 navio_boss.tiro_boss()
+                assets['boss atirando'].play()
             if state == playing:
                 hits3 =  pygame.sprite.spritecollide(navio_amigo , todos_boss , False , pygame.sprite.collide_mask)
                 if len(hits3) > 0:
