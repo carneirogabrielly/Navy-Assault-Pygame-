@@ -125,6 +125,7 @@ def carrega_imagens():
     #criação da lista vazia para adicionar a animação da explosão do inimigo
     anim_explod_inimigo = []
 
+    #adicionar as animacoes da explosão do inimigo na biblioteca assets
     for i in range(23):
         arquivo3 = f'Imagens/Barco_inimigo/explod_inimigo/{i}.png'
 
@@ -134,8 +135,10 @@ def carrega_imagens():
 
     assets['anim_explod_inimigo'] = anim_explod_inimigo
 
+    #criação lista vazia para animação tiro inimigo
     anim_tiro_inimigo2= []
 
+    #adicionando na biblioteca as animações do tiro inimigo
     for i in range(3):
         arquivo4 = f'Imagens/Barco_inimigo/tiro_inimigo/{i}.png'
 
@@ -147,7 +150,10 @@ def carrega_imagens():
 
     assets['vida_boss'] = pygame.transform.scale(assets['imagem_boss'] , (50 , 50))
 
+    #criação lista vazia para animação da explosão do boss
     anim_explod_boss = []
+
+    #adicionando as animações no dicionario
     for i in range(49):
         arquivo5 = f'Imagens/Boss/explosão_boss/{i}.png'
         imagem = pygame.image.load(arquivo5).convert_alpha()
@@ -156,49 +162,49 @@ def carrega_imagens():
 
     assets['anim_explod_boss'] = anim_explod_boss
 
-    #fonte
+    #adicionando as fontes no dicionario
     assets['fonte_regen'] = pygame.font.SysFont('arial' , 28 , True , False)
     assets['fonte_placar'] = pygame.font.SysFont('cooper black' , 28 , True , False)
 
 
     #Sons 
-
-
     pygame.mixer.music.load('Sons/Música_fundo.mp3')
     pygame.mixer.music.set_volume(0.4)
 
-    assets['som do tiro do jogador'] = pygame.mixer.Sound('Sons/tiro_jogador.ogg')
-    assets['som do tiro do jogador'].set_volume(0.2)
 
-    assets['som do tiro do inimigo'] = pygame.mixer.Sound('Sons/tiro_oponente.wav')
-    assets['som do tiro do inimigo'].set_volume(0.2)
+    assets['som do tiro do jogador'] = pygame.mixer.Sound('Sons/tiro_jogador.ogg') #Carrega e armazena o som em uma variável
+    assets['som do tiro do jogador'].set_volume(0.2) #altura do som
 
-    assets['som da explosão do jogador'] = pygame.mixer.Sound('Sons/explosão_barco.wav')
-    assets['som da explosão do jogador'].set_volume(0.2)
+    assets['som do tiro do inimigo'] = pygame.mixer.Sound('Sons/tiro_oponente.wav') #Carrega e armazena o som em uma variável
+    assets['som do tiro do inimigo'].set_volume(0.2)  #altura do som
 
-    assets['som da explosão do inimigo'] = pygame.mixer.Sound('Sons/Inimigo_explodindo.ogg')
-    assets['som da explosão do inimigo'].set_volume(0.2)
+    assets['som da explosão do jogador'] = pygame.mixer.Sound('Sons/explosão_barco.wav') #Carrega e armazena o som em uma variável
+    assets['som da explosão do jogador'].set_volume(0.2)  #altura do som
 
-    assets['som do jogador travado'] = pygame.mixer.Sound('Sons/navio_n_atira.wav')
-    assets['som do jogador travado'].set_volume(0.4)
+    assets['som da explosão do inimigo'] = pygame.mixer.Sound('Sons/Inimigo_explodindo.ogg') #Carrega e armazena o som em uma variável
+    assets['som da explosão do inimigo'].set_volume(0.2)  #altura do som
 
-    assets['jogador colidindo'] = pygame.mixer.Sound('Sons/contato_com_navio.wav')
-    assets['jogador colidindo'].set_volume(0.3)
+    assets['som do jogador travado'] = pygame.mixer.Sound('Sons/navio_n_atira.wav') #Carrega e armazena o som em uma variável
+    assets['som do jogador travado'].set_volume(0.4)  #altura do som
 
-    assets['jogador curando'] = pygame.mixer.Sound('Sons/barco_curando.wav')
-    assets['jogador curando'].set_volume(0.6)
+    assets['jogador colidindo'] = pygame.mixer.Sound('Sons/contato_com_navio.wav') #Carrega e armazena o som em uma variável
+    assets['jogador colidindo'].set_volume(0.3) #altura do som
 
-    assets['boss_chegando'] = pygame.mixer.Sound('Sons/som_boss_chegando.flac')
-    assets['boss_chegando'].set_volume(0.9)
+    assets['jogador curando'] = pygame.mixer.Sound('Sons/barco_curando.wav') #Carrega e armazena o som em uma variável
+    assets['jogador curando'].set_volume(0.6) #altura do som
 
-    assets['matou boss'] = pygame.mixer.Sound('Sons/win_sound.wav')
-    assets['matou boss'].set_volume(0.9)
+    assets['boss_chegando'] = pygame.mixer.Sound('Sons/som_boss_chegando.flac') #Carrega e armazena o som em uma variável
+    assets['boss_chegando'].set_volume(0.9) #altura do som
 
-    assets['boss atirando'] = pygame.mixer.Sound('Sons/son_explod_boss.wav')
-    assets['boss atirando'].set_volume(0.3)
+    assets['matou boss'] = pygame.mixer.Sound('Sons/win_sound.wav') #Carrega e armazena o som em uma variável
+    assets['matou boss'].set_volume(0.9) #altura do som
+
+    assets['boss atirando'] = pygame.mixer.Sound('Sons/son_explod_boss.wav') #Carrega e armazena o som em uma variável
+    assets['boss atirando'].set_volume(0.3) #altura do som
     
     return assets
 
+#definindo a variavel e chamando a função
 assets = carrega_imagens()
 
 
@@ -233,6 +239,7 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
             self.rect.x = random.randint(0 , 560)
 
     def tiro_inimigo(self):
+        #posicionando o tiro
         novo_tiro_inimigo = Tiro_inimigo(assets['imagem_tiro_inimigo'] , self.rect.bottom  , self.rect.centerx)
         self.all_sprites.add(novo_tiro_inimigo)
         self.todos_tiros_inimigo.add(novo_tiro_inimigo)
@@ -253,7 +260,7 @@ class jogador(pygame.sprite.Sprite):
         self.imagem_tiro = assets['imagem_tiro']
     
     def update(self):
-        # Atualização da posição da nave
+        # Atualização da posição do barco
         self.rect.x += self.vx_jogador
 
         # Mantem dentro da tela
@@ -263,7 +270,7 @@ class jogador(pygame.sprite.Sprite):
             self.rect.x = -29
             
     def tiro(self):
-    # A nova bala vai ser criada logo acima e no centro horizontal da nave
+    # criação da nova bala
         novo_tiro = Tiro(self.imagem_tiro, self.rect.top, self.rect.centerx)
         self.all_sprites.add(novo_tiro)
         self.todos_tiros.add(novo_tiro)
@@ -272,17 +279,15 @@ class jogador(pygame.sprite.Sprite):
 
     
 class Tiro(pygame.sprite.Sprite):
-    # Construtor da classe.
+    # Construtor da classe do tiro do barco do jogador
 
     def __init__(self, img, bottom, centerx):
-        # Construtor da classe mãe (Sprite).
         pygame.sprite.Sprite.__init__(self)
 
         self.image = img
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 
-        # Coloca no lugar inicial definido em x, y do constutor
         self.rect.centerx = centerx
         self.rect.bottom = bottom +20
         self.speedy = -10  # Velocidade fixa para cima
@@ -295,18 +300,16 @@ class Tiro(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 
+#construindo classe do tiro inimigo
 class Tiro_inimigo(pygame.sprite.Sprite):
-    # Construtor da classe.
 
     def __init__(self, img, bottom, centerx):
-        # Construtor da classe mãe (Sprite).
         pygame.sprite.Sprite.__init__(self)
 
         self.image = img
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 
-        # Coloca no lugar inicial definido em x, y do constutor
         self.rect.centerx = centerx
         self.rect.bottom = bottom +20
         self.speedy = 5  # Velocidade fixa para cima
@@ -320,6 +323,7 @@ class Tiro_inimigo(pygame.sprite.Sprite):
             self.kill()
 
 
+#construindo a classe do boss que aparece ao final do jogo
 class Boss(pygame.sprite.Sprite):
     def __init__(self , assets , groups):
         pygame.sprite.Sprite.__init__(self)
@@ -336,7 +340,8 @@ class Boss(pygame.sprite.Sprite):
 
         self.tempo = pygame.time.get_ticks()
         self.subiu = False
-        
+    
+    #atualizando os atributos da classe
     def update(self):
         self.rect.x += self.vx_boss
         self.rect.y += self.vy_boss
@@ -363,7 +368,8 @@ class Boss(pygame.sprite.Sprite):
             self.vy_boss = 10
             self.vx_boss = 0
             self.subiu = False
-            
+    
+    #atualizando os tiros do boss e carregando as imagens(canhões)
     def tiro_boss(self):
         novo_tiro_boss1 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 0 , 10 )
         novo_tiro_boss2 = Tiro_boss(assets['imagem_bala_boss'] , self.rect.bottom , self.rect.centerx , 5, 10 )
@@ -375,6 +381,7 @@ class Boss(pygame.sprite.Sprite):
         self.all_sprites.add(novo_tiro_boss2)
         self.all_sprites.add(novo_tiro_boss3)
 
+#criação da classe dos tiros do boss
 class Tiro_boss(pygame.sprite.Sprite):
     def __init__(self, img , bottom , centerx , vx_tiro_boss , vy_tiro_boss):
         pygame.sprite.Sprite.__init__(self)
@@ -385,6 +392,7 @@ class Tiro_boss(pygame.sprite.Sprite):
         self.rect.bottom = bottom
         self.vy_tiro_boss = vy_tiro_boss
         self.vx_tiro_boss = vx_tiro_boss
+    #atualizando as posições do tiro
     def update(self):
         self.rect.x += self.vx_tiro_boss
         self.rect.y += self.vy_tiro_boss
@@ -394,6 +402,7 @@ class Tiro_boss(pygame.sprite.Sprite):
         if self.rect.bottom > comprimento:
             self.kill()
 
+#criando classe da animação do canhao 
 class canhao_anim(pygame.sprite.Sprite):
 
     def __init__(self, centrox, velocidadex, assets):
@@ -520,7 +529,7 @@ class explod_inimigo(pygame.sprite.Sprite):#Representa a animação de explosão
             self.rect.center =  centro#Define a posição em 'x' e 'y' do centro da imagem
        
 
-
+#classe da animação do canhão do inimigo
 class canhao_inimigo_anim(pygame.sprite.Sprite):
     
     def __init__(self, centerx, centery, velocidadex, velocidadey, assets):    
