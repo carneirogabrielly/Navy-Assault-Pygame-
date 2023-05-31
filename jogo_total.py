@@ -772,7 +772,7 @@ def tela_jogo(window):
                 state = venceu
         
         
-        if tempo_fase1 - (1000 * 1) > 0 and status_fase == fase_1:
+        if tempo_fase1 - (1000 * 90) > 0 and status_fase == fase_1:
             status_fase = fase_final
             assets['boss_chegando'].play()
             for tiro_inimigo2 in todos_tiros_inimigo:
