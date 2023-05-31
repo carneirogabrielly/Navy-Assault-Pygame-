@@ -807,7 +807,7 @@ def tela_jogo(window):
             navio_amigo.kill()#Remove o navio do grupo de sprites 
             assets['som da explosão do jogador'].play()#Roda o som de explosão do navio do jogador
             tempo_morte =  pygame.time.get_ticks()
-            if tempo_morte - morreu > 1500:
+            if tempo_morte - morreu > 1500:  
                 state = game_over
 
         #Verifcia se o boss foi  morto 
@@ -817,6 +817,7 @@ def tela_jogo(window):
             all_sprites.add(explosao_boss)
             navio_boss.kill()
             agora2 = pygame.time.get_ticks()
+            print(placar)
             if agora2 - boss_atingido > 1500:
                 state = venceu
         
