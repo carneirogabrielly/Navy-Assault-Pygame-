@@ -240,7 +240,7 @@ class Inimigo(pygame.sprite.Sprite): #Classe dos navios inimigos
 
     def tiro_inimigo(self):
         #posicionando o tiro
-        novo_tiro_inimigo = Tiro_inimigo(assets['imagem_tiro_inimigo'] , self.rect.bottom  , self.rect.centerx)
+        novo_tiro_inimigo = Tiro_inimigo(assets['imagem_tiro_inimigo'] , self.rect.bottom  , self.rect.centerx , 0 , 5 )
         self.all_sprites.add(novo_tiro_inimigo)
         self.todos_tiros_inimigo.add(novo_tiro_inimigo)
 
@@ -271,56 +271,53 @@ class jogador(pygame.sprite.Sprite):
             
     def tiro(self):
     # criação da nova bala
-        novo_tiro = Tiro(self.imagem_tiro, self.rect.top, self.rect.centerx)
+        novo_tiro = Tiro_amigo(self.imagem_tiro, self.rect.top, self.rect.centerx , 0 ,10  )
         self.all_sprites.add(novo_tiro)
         self.todos_tiros.add(novo_tiro)
 
      
 
-    
 class Tiro(pygame.sprite.Sprite):
-    # Construtor da classe do tiro do barco do jogador
 
-    def __init__(self, img, bottom, centerx):
+    def __init__(self , img , bottom , centerx , vx_tiro , vy_tiro):
         pygame.sprite.Sprite.__init__(self)
-
         self.image = img
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 
+        self.vx_tiro = vx_tiro
+        self.vy_tiro = vy_tiro
+    
         self.rect.centerx = centerx
-        self.rect.bottom = bottom +20
-        self.speedy = -10  # Velocidade fixa para cima
+        self.rect.bottom = bottom
 
     def update(self):
-        # A bala só se move no eixo y
-        self.rect.y += self.speedy
-
-        # Se o tiro passar do inicio da tela, morre.
-        if self.rect.bottom < 0:
+        
+        self.rect.y += self.vy_tiro
+        self.rect.x += self.vx_tiro
+        
+        if self.rect.bottom < 0 or self.rect.left > largura or self.rect.right < 0:
             self.kill()
+
+class Tiro_amigo(Tiro):
+    # Construtor da classe do Tiro_amigo do barco do jogador
+
+    def __init__(self, img, bottom, centerx , vx_tiro , vy_tiro ):
+        super().__init__(img , bottom + 20 , centerx , vx_tiro , vy_tiro)
+        self.vy_tiro = -1 * vy_tiro
+    def update(self):
+        super().update()
 
 #construindo classe do tiro inimigo
-class Tiro_inimigo(pygame.sprite.Sprite):
+class Tiro_inimigo(Tiro):
 
-    def __init__(self, img, bottom, centerx):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, img, bottom, centerx , vx_tiro , vy_tiro):
+        super().__init__(img , bottom + 20 , centerx , vx_tiro , vy_tiro)
 
-        self.image = img
-        self.rect = self.image.get_rect()
-        self.mask = pygame.mask.from_surface(self.image)
-
-        self.rect.centerx = centerx
-        self.rect.bottom = bottom +20
-        self.speedy = 5  # Velocidade fixa para cima
+        
 
     def update(self):
-        # A bala só se move no eixo y
-        self.rect.y += self.speedy
-
-        # Se o tiro passar do inicio da tela, morre.
-        if self.rect.bottom < 0:
-            self.kill()
+        super().update()
 
 
 #construindo a classe do boss que aparece ao final do jogo
@@ -382,25 +379,13 @@ class Boss(pygame.sprite.Sprite):
         self.all_sprites.add(novo_tiro_boss3)
 
 #criação da classe dos tiros do boss
-class Tiro_boss(pygame.sprite.Sprite):
-    def __init__(self, img , bottom , centerx , vx_tiro_boss , vy_tiro_boss):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = img
-        self.rect = self.image.get_rect()
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect.centerx = centerx
-        self.rect.bottom = bottom
-        self.vy_tiro_boss = vy_tiro_boss
-        self.vx_tiro_boss = vx_tiro_boss
-    #atualizando as posições do tiro
+class Tiro_boss(Tiro):
+ 
+    def __init__(self, img, bottom, centerx , vx_tiro , vy_tiro ):
+        super().__init__(img , bottom + 20 , centerx , vx_tiro , vy_tiro)
+        
     def update(self):
-        self.rect.x += self.vx_tiro_boss
-        self.rect.y += self.vy_tiro_boss
-
-        if self.rect.left > largura or self.rect.right < 0:
-            self.kill()
-        if self.rect.bottom > comprimento:
-            self.kill()
+        super().update()
 
 #criando classe da animação do canhao 
 class canhao_anim(pygame.sprite.Sprite):
